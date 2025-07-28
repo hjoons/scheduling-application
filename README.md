@@ -1,29 +1,72 @@
-# Create T3 App
+# Scheduling Web App for UTea Pho
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+This scheduling web application will be used by a small business to generate schedules for employees on a weekly basis. This web application will also be used by employees to track tips and hours worked over periods of time (planned feature).
 
-## What's next? How do I make an app with this?
+## Tech Stack
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- **Frontend**: Next.js, React, TypeScript
+- **Backend**: Next.js API Routes
+- **Database**: Supabase (PostgreSQL)
+- **ORM**: Drizzle ORM
+- **Authentication**: Clerk
+- **Styling**: Tailwind CSS + ShadCN
+- **Deployment**: Netlify
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## User Roles
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+- **Administrator**: Full access to manage employees, create schedules, and oversee all operations
+- **Team Lead**: Can view/update employee availability and enter shift tips
+- **Employee**: Can view schedules and track personal hours/tips
+- **Unauthorized**: Can not access any pages -- prevents unauthorized users from creating an account and accessing information
 
-## Learn More
+## Administrative User Stories (Managerial)
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+- As an administrator, I want to see a list of all active and inactive employees (inactive = former employees or those on extended leave)
+- As an administrator, I want to create schedules based on employees' availability whenever I want
+- As an administrator, I want to specify time slots for events where employees don't need to work (holidays, maintenance, etc.)
+- As an administrator, I want to have a log of previously used schedules for reference and pattern analysis
+- As an administrator, I want to be able to approve, limit, and deny access of employees to the system
+- As a team lead, I want to view and update employees' availability preferences
+- As a team lead, I want to enter the tips received for each shift to track employee earnings
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+## Employee User Stories
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+- As an employee, I want to set and update my availability preferences
+- As an employee, I want to view my assigned shifts in an easy-to-read format
+- As an employee, I want to see my total hours worked and tips earned over time
+- As an employee, I want to receive notifications about schedule changes
 
-## How do I deploy this?
+## General Features (All Users)
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+- As a user, I want to be able to authenticate myself and log into the web application securely
+- As a user, I want to be able to view the current schedule in a clean, mobile-friendly format
+- As a user, I want to generate summaries for my time worked and tips received over custom time periods
+
+## Feature Priority
+
+### MVP (Minimum Viable Product)
+
+- [ ] User authentication and role-based access
+- [ ] Employee management (add/edit/deactivate)
+- [ ] Basic availability setting
+- [ ] Schedule creation and viewing
+- [ ] Shift assignment
+
+### Phase 2
+
+- [ ] Tips tracking and reporting
+- [ ] Schedule history and analytics
+- [ ] Advanced availability preferences
+
+### Future Enhancements
+
+- [ ] Automatic schedule optimization
+- [ ] Integration with payroll systems
+- [ ] Advanced reporting and insights
+
+## TODO:
+
+- [ ] Set up environment variables for Netlify and Supabase
+- [ ] Generate a basic, modern front-end utilizing V0 by Vercel
+- [ ] Set up backend schema and prepare types used on the server-side
+- [ ] Integrate Clerk authentication and authorization for the front-end
