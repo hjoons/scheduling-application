@@ -15,9 +15,10 @@ This scheduling web application will be used by a small business to generate sch
 ## User Roles
 
 - **Administrator**: Full access to manage employees, create schedules, and oversee all operations
-- **Team Lead**: Can view/update employee availability and enter shift tips
-- **Employee**: Can view schedules and track personal hours/tips
-- **Unauthorized**: Can not access any pages -- prevents unauthorized users from creating an account and accessing information
+- **Leadership**: Can view/update employee availability and enter shift tips
+- **Staff**: Can view schedules and track personal hours/tips
+- **Trainee**: Can view schedules and track personal hours (no tips)
+- **Unvalidated**: Can not access any pages -- prevents unauthorized users from creating an account and accessing information
 
 ## Administrative User Stories (Managerial)
 
@@ -66,7 +67,7 @@ This scheduling web application will be used by a small business to generate sch
 
 ## TODO:
 
-- [ ] Set up environment variables for Netlify and Supabase
+- [x] Set up environment variables for Netlify and Supabase
 - [ ] Generate a basic, modern front-end utilizing V0 by Vercel
 - [ ] Set up backend schema and prepare types used on the server-side
 - [ ] Integrate Clerk authentication and authorization for the front-end
