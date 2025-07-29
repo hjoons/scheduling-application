@@ -5,8 +5,8 @@ import { staffStatusEnum, userRoleEnum } from "./enums";
 
 export const users = createTable("users", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
-  first_name: varchar("first_name", { length: 256 }).notNull(),
-  last_name: varchar("last_name", { length: 256 }).notNull(),
+  firstName: varchar("first_name", { length: 256 }).notNull(),
+  lastName: varchar("last_name", { length: 256 }).notNull(),
   role: userRoleEnum("role").notNull().default("unvalidated"),
   status: staffStatusEnum("status").notNull().default("active"),
   email: varchar("email", { length: 256 }).unique().notNull(),
