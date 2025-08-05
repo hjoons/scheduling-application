@@ -13,7 +13,7 @@
 
 # import env variables from .env
 set -a
-source .env
+source .env.local
 
 DB_PASSWORD=$(echo "$DATABASE_URL" | awk -F':' '{print $3}' | awk -F'@' '{print $1}')
 DB_PORT=$(echo "$DATABASE_URL" | awk -F':' '{print $4}' | awk -F'\/' '{print $1}')
@@ -73,6 +73,8 @@ if [ "$DB_PASSWORD" = "password" ]; then
   DB_PASSWORD=$(openssl rand -base64 12 | tr '+/' '-_')
   sed -i '' "s#:password@#:$DB_PASSWORD@#" .env
 fi
+
+echo "Starting database container '$DB_CONTAINER_NAME' on port $DB_PORT with password '$DB_PASSWORD'"
 
 $DOCKER_CMD run -d \
   --name $DB_CONTAINER_NAME \

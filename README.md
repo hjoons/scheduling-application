@@ -72,7 +72,7 @@ This scheduling web application will be used by a small business to generate sch
 ## TODO:
 
 - [x] Set up environment variables for Netlify and Supabase
-- [ ] Set up backend schema and prepare types used on the server-side
+- [x] Set up backend schema and prepare types used on the server-side
   - [x] Define front-end pages in a design document and generate schemas
   - [x] Define helper functions and enums for table creation
   - [ ] Create tables in back-end and test insertions from server side pages
