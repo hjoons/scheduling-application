@@ -75,16 +75,16 @@ This scheduling web application will be used by a small business to generate sch
 
 - [ ] **CRUD Operations**
   - [ ] Set up Zod schemas for request/response validation
-    - [ ] User validation schemas (create, update, role changes)
+    - [x] User validation schemas (create, update, role changes)
     - [ ] Core block validation schemas (time blocks, employee requirements)
     - [ ] Shift validation schemas (assignments, tips, dates)
     - [ ] Availability validation schemas (preferences, exceptions)
 
-  - [ ] User Management API Routes
-    - [ ] `GET /api/users` - List all users
-    - [ ] `POST /api/users` - Create new user account
-    - [ ] `PUT /api/users/[id]` - Update user profile and role
-    - [ ] `DELETE /api/users/[id]` - Deactivate user account
+  - [x] User Management API Routes
+    - [x] `GET /api/users` - List all users
+    - [x] `POST /api/users` - Create new user account
+    - [x] `PUT /api/users/[id]` - Update user profile and role
+    - [x] `DELETE /api/users/[id]` - Deactivate user account (consider making this a soft delete)
 
   - [ ] Core Blocks API Routes
     - [ ] `GET /api/core-blocks` - Get all time block templates
