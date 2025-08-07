@@ -71,11 +71,68 @@ This scheduling web application will be used by a small business to generate sch
 
 ## TODO:
 
-- [x] Set up environment variables for Netlify and Supabase
-- [x] Set up backend schema and prepare types used on the server-side
-  - [x] Define front-end pages in a design document and generate schemas
-  - [x] Define helper functions and enums for table creation
-  - [ ] Create tables in back-end and test insertions from server side pages
+### API Routes (Backend)
+
+- [ ] **CRUD Operations**
+  - [ ] Set up Zod schemas for request/response validation
+    - [ ] User validation schemas (create, update, role changes)
+    - [ ] Core block validation schemas (time blocks, employee requirements)
+    - [ ] Shift validation schemas (assignments, tips, dates)
+    - [ ] Availability validation schemas (preferences, exceptions)
+
+  - [ ] User Management API Routes
+    - [ ] `GET /api/users` - List all users
+    - [ ] `POST /api/users` - Create new user account
+    - [ ] `PUT /api/users/[id]` - Update user profile and role
+    - [ ] `DELETE /api/users/[id]` - Deactivate user account
+
+  - [ ] Core Blocks API Routes
+    - [ ] `GET /api/core-blocks` - Get all time block templates
+    - [ ] `POST /api/core-blocks` - Create new time block template
+    - [ ] `PUT /api/core-blocks/[id]` - Update time block requirements
+    - [ ] `DELETE /api/core-blocks/[id]` - Remove time block template
+
+  - [ ] Availability API Routes
+    - [ ] `GET /api/availability/[userId]` - Get user's availability preferences
+    - [ ] `POST /api/availability` - Set availability for core blocks
+    - [ ] `PUT /api/availability/[id]` - Update availability preferences
+    - [ ] `DELETE /api/availability/[id]` - Remove availability
+
+  - [ ] Exceptions API Routes
+    - [ ] `GET /api/exceptions/[userId]` - Get user's availability exceptions
+    - [ ] `POST /api/exceptions` - Create availability exception
+    - [ ] `PUT /api/exceptions/[id]` - Update exception details
+    - [ ] `DELETE /api/exceptions/[id]` - Remove exception
+
+  - [ ] Shift Management API Routes
+    - [ ] `GET /api/shifts` - Get shifts with date/user filtering
+    - [ ] `POST /api/shifts` - Create/assign new shift
+    - [ ] `PUT /api/shifts/[id]` - Update shift details and tips
+    - [ ] `DELETE /api/shifts/[id]` - Remove shift assignment
+
+  - [ ] Reporting API Routes
+    - [ ] `GET /api/reports/tips/[userId]` - Tips earned by user over period
+    - [ ] `GET /api/reports/hours/[userId]` - Hours worked by user over period
+    - [ ] `GET /api/reports/schedule-history` - Historical schedule data
+
+- [ ] **Scheduling Engine** (Business Logic)
+  - [ ] Set up Zod schemas for request/response validation
+    - [ ] Schedule generation schemas (create, update, and get)
+    - [ ] Schedule validation schemas (conflict responses and coverage)
+    - [ ] Analytics schemas (workload and availability preferences)
+  - Schedule Generation API Routes
+    - [ ] `POST /api/schedule/generate` - Generate schedule for a week of the month
+    - [ ] `GET /api/schedule/week/[date]` - Get the weekly schedule view
+    - [ ] `PUT /api/schedule/week/[date]` - Bulk update weekly assignments
+
+  - Schedule Validation API Routes
+    - [ ] `GET /api/schedule/validate/[date]` - Checks for any conflicts / gaps
+    - [ ] `GET /api/schedule/coverage` - Analyze staffing coverage (are all shifts filled to # of employees)
+  - Analytics API Routes
+    - [ ] `GET /api/analytics/workload/[userId]` - Number of hours worked in a week
+    - [ ] `GET /api/analytics/preferences/[userId]` - Availability pattern insights
+
+### Frontend Development
 
 - [ ] Generate a basic, modern front-end utilizing V0 by Vercel
   - [ ] Import ShadCN and set up base components for use
