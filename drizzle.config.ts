@@ -1,12 +1,15 @@
 import { type Config } from "drizzle-kit";
 
-import { env } from "@/env";
+import { env } from "~/env";
+
+const SCHEMA_DIR = "./src/server/db/";
 
 export default {
-  schema: "./src/server/db/schema.ts",
+  schema: `${SCHEMA_DIR}/schemas/*.ts`,
+  out: `${SCHEMA_DIR}/migrations`,
   dialect: "postgresql",
   dbCredentials: {
     url: env.DATABASE_URL,
   },
-  tablesFilter: ["scheduling-application_*"],
+  tablesFilter: ["UTPS_*"],
 } satisfies Config;

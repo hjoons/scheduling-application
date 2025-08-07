@@ -43,6 +43,10 @@ This scheduling web application will be used by a small business to generate sch
 - As a user, I want to be able to view the current schedule in a clean, mobile-friendly format
 - As a user, I want to generate summaries for my time worked and tips received over custom time periods
 
+## Backend Schemas
+
+![Schemas](public/scheduler-schemas.png)
+
 ## Feature Priority
 
 ### MVP (Minimum Viable Product)
@@ -68,6 +72,11 @@ This scheduling web application will be used by a small business to generate sch
 ## TODO:
 
 - [x] Set up environment variables for Netlify and Supabase
+- [x] Set up backend schema and prepare types used on the server-side
+  - [x] Define front-end pages in a design document and generate schemas
+  - [x] Define helper functions and enums for table creation
+  - [ ] Create tables in back-end and test insertions from server side pages
+
 - [ ] Generate a basic, modern front-end utilizing V0 by Vercel
-- [ ] Set up backend schema and prepare types used on the server-side
+  - [ ] Import ShadCN and set up base components for use
 - [ ] Integrate Clerk authentication and authorization for the front-end
