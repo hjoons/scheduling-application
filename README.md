@@ -75,22 +75,31 @@ This scheduling web application will be used by a small business to generate sch
 
 - [ ] **CRUD Operations**
   - [ ] Set up Zod schemas for request/response validation
-    - [x] User validation schemas (create, update, role changes)
-    - [ ] Core block validation schemas (time blocks, employee requirements)
-    - [ ] Shift validation schemas (assignments, tips, dates)
-    - [ ] Availability validation schemas (preferences, exceptions)
+    - [ ] Request Validation
+      - [x] User validation schemas (create, update, role changes)
+      - [x] Core block validation schemas (time blocks, employee requirements)
+      - [ ] Shift validation schemas (assignments, tips, dates)
+      - [ ] Availability validation schemas (preferences, exceptions)
+    - [ ] Response Validation
+      - [ ] User validation
+      - [ ] Core block validation
+      - [ ] Shift validation
+      - [ ] Availability validation
 
   - [x] User Management API Routes
-    - [x] `GET /api/users` - List all users
+    - [x] `GET /api/users` - List all users with role/status filtering
     - [x] `POST /api/users` - Create new user account
+    - [x] `GET /api/users/[id]` - Get individual user details
     - [x] `PUT /api/users/[id]` - Update user profile and role
-    - [x] `DELETE /api/users/[id]` - Deactivate user account (consider making this a soft delete)
+    - [x] `DELETE /api/users/[id]` - Deactivate user account
 
-  - [ ] Core Blocks API Routes
-    - [ ] `GET /api/core-blocks` - Get all time block templates
-    - [ ] `POST /api/core-blocks` - Create new time block template
-    - [ ] `PUT /api/core-blocks/[id]` - Update time block requirements
-    - [ ] `DELETE /api/core-blocks/[id]` - Remove time block template
+  - [x] Core Blocks API Routes
+    - [x] `GET /api/core-blocks` - Get all time block templates with day/shift filtering
+    - [x] `POST /api/core-blocks` - Create new time block template
+    - [x] `DELETE /api/core-blocks` - Bulk delete core blocks by day/shift parameters
+    - [x] `GET /api/core-blocks/[id]` - Get individual core block details
+    - [x] `PUT /api/core-blocks/[id]` - Update time block requirements
+    - [x] `DELETE /api/core-blocks/[id]` - Remove time block template
 
   - [ ] Availability API Routes
     - [ ] `GET /api/availability/[userId]` - Get user's availability preferences

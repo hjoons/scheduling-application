@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { createTable } from "./utils";
 import { dayOfWeekEnum, shiftOfDayEnum } from "./enums";
-import { bigserial, bigint, timestamp } from "drizzle-orm/pg-core";
+import { bigserial, bigint, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const coreBlocks = createTable("core_blocks", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
@@ -15,7 +15,9 @@ export const coreBlocks = createTable("core_blocks", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
-});
+}, (table) => ({
+  dayShiftUnique: uniqueIndex("unique_day_shift_idx").on(table.dayOfWeek, table.shiftOfDay)
+}));
 
 export type CoreBlock = typeof coreBlocks.$inferSelect;
 export type CoreBlockInsert = typeof coreBlocks.$inferInsert;

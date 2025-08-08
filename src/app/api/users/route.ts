@@ -35,15 +35,17 @@ export async function GET(request: NextRequest) {
     
     return Response.json({ 
         success: true,
+        message: usersList.length > 0 ? "Users retrieved successfully" : "No users found",
         users: usersList,
         error: null
-     });
+     }, {status: 200});
   } catch (error) {
     const apiError = handleAPIError(error);
 
     return Response.json({
         success: false,
-        users: [],
+        message: "Failed to retrieve users",
+        users: null,
         error: {
             type: apiError.type,
             message: apiError.message,
@@ -61,7 +63,6 @@ export async function POST(request: NextRequest) {
         // Validate request body
         const userData = CreateUserRequestSchema.parse(body);
 
-
         // Insert new user into the database
         const newUser = await db.insert(users)
             .values(userData)
@@ -69,7 +70,8 @@ export async function POST(request: NextRequest) {
 
         return Response.json({
             success: true,
-            user: newUser[0],
+            message: newUser ? "User created successfully" : "No user created",
+            users: newUser[0] ?? null,
             error: null
         }, {status: 201});
     } catch (error) {
@@ -77,7 +79,8 @@ export async function POST(request: NextRequest) {
 
         return Response.json({
             success: false,
-            user: null,
+            message: "User creation failed",
+            users: null,
             error: {
                 type: apiError.type,
                 message: apiError.message,
