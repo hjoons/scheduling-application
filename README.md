@@ -101,15 +101,15 @@ This scheduling web application will be used by a small business to generate sch
     - [x] `PUT /api/core-blocks/[id]` - Update time block requirements
     - [x] `DELETE /api/core-blocks/[id]` - Remove time block template
 
-  - [ ] Availability API Routes
-    - [ ] `GET /api/availability/[userId]` - Get user's availability preferences
-    - [ ] `POST /api/availability` - Set availability for core blocks
-    - [ ] `PUT /api/availability/[id]` - Update availability preferences
-    - [ ] `DELETE /api/availability/[id]` - Remove availability
+  - [x] Availability API Routes
+    - [x] `GET /api/availability/user/[userId]` - Get user's availability preferences
+    - [x] `POST /api/availability/user/[userId]` - Set availability for core blocks
+    - [x] `PUT /api/availability/user/[userId]` - Update availability preferences (delete and set)
+    - [x] `DELETE /api/availability/user/[userId]` - Remove all availability from a user (reset)
 
   - [ ] Exceptions API Routes
     - [ ] `GET /api/exceptions/[userId]` - Get user's availability exceptions
-    - [ ] `POST /api/exceptions` - Create availability exception
+    - [ ] `POST /api/exceptions/[userId]` - Create availability exception
     - [ ] `PUT /api/exceptions/[id]` - Update exception details
     - [ ] `DELETE /api/exceptions/[id]` - Remove exception
 
