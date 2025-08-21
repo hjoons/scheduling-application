@@ -79,7 +79,7 @@ This scheduling web application will be used by a small business to generate sch
       - [x] User validation schemas (create, update, role changes)
       - [x] Core block validation schemas (time blocks, employee requirements)
       - [ ] Shift validation schemas (assignments, tips, dates)
-      - [ ] Availability validation schemas (preferences, exceptions)
+      - [x] Availability validation schemas (preferences, exceptions)
     - [ ] Response Validation
       - [ ] User validation
       - [ ] Core block validation
@@ -107,11 +107,12 @@ This scheduling web application will be used by a small business to generate sch
     - [x] `PUT /api/availability/user/[userId]` - Update availability preferences (delete and set)
     - [x] `DELETE /api/availability/user/[userId]` - Remove all availability from a user (reset)
 
-  - [ ] Exceptions API Routes
-    - [ ] `GET /api/exceptions/[userId]` - Get user's availability exceptions
-    - [ ] `POST /api/exceptions/[userId]` - Create availability exception
-    - [ ] `PUT /api/exceptions/[id]` - Update exception details
-    - [ ] `DELETE /api/exceptions/[id]` - Remove exception
+  - [x] Exceptions API Routes
+    - [x] `GET /api/exceptions/[userId]` - Get user's availability exceptions
+    - [x] `POST /api/exceptions/` - Create availability exception
+    - [x] `PUT /api/exceptions/[id]` - Update exception details
+    - [x] `DELETE /api/exceptions/[id]` - Remove exception
+    - [x] `GET /api/exceptions/[id]` - Get singular exception
 
   - [ ] Shift Management API Routes
     - [ ] `GET /api/shifts` - Get shifts with date/user filtering
