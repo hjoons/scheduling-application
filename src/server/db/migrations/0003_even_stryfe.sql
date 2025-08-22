@@ -1,0 +1,9 @@
+-- CREATE TABLE "UTPS_user_shifts" (
+-- 	"id" bigserial PRIMARY KEY NOT NULL,
+-- 	"user_id" bigint NOT NULL,
+-- 	"shift_id" bigint,
+-- 	"created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+-- );
+--> statement-breakpoint
+-- ALTER TABLE "UTPS_user_shifts" ADD CONSTRAINT "UTPS_user_shifts_user_id_UTPS_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."UTPS_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+-- ALTER TABLE "UTPS_user_shifts" ADD CONSTRAINT "UTPS_user_shifts_shift_id_UTPS_shifts_id_fk" FOREIGN KEY ("shift_id") REFERENCES "public"."UTPS_shifts"("id") ON DELETE cascade ON UPDATE no action;
