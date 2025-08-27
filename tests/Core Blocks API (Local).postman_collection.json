@@ -1,0 +1,857 @@
+{
+	"info": {
+		"_postman_id": "0bfac496-f603-48e1-a39f-fd6c103dcf5f",
+		"name": "Core Blocks API (Local)",
+		"description": "CRUD operations for Core Blocks with positive and negative test cases",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47432747",
+		"_collection_link": "https://hjoons-6329250.postman.co/workspace/UTP's-Workspace~7992f774-284a-465c-853d-da3e8b07920d/collection/47432747-0bfac496-f603-48e1-a39f-fd6c103dcf5f?action=share&source=collection_link&creator=47432747"
+	},
+	"item": [
+		{
+			"name": "Core Blocks CRUD",
+			"item": [
+				{
+					"name": "1. POST - Create Core Block (Valid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Response has success true', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success, true);",
+									"});",
+									"",
+									"pm.test('Response contains core block data', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.coreBlocks).to.have.property('id');",
+									"    pm.expect(jsonData.coreBlocks.dayOfWeek, 'mon');",
+									"    pm.expect(jsonData.coreBlocks.shiftOfDay, 'm1');",
+									"});",
+									"",
+									"// Save core block ID for other tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('coreBlockId', jsonData.coreBlocks.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1,\n  \"dayOfWeek\": \"mon\",\n  \"shiftOfDay\": \"m1\",\n  \"timeStart\": 800,\n  \"timeEnd\": 1200,\n  \"numberOfEmployees\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. POST - Create Core Block (Invalid - Missing Required Fields)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Response has success false', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"});",
+									"",
+									"pm.test('Error type is VALIDATION_ERROR', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql('VALIDATION_ERROR');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"dayOfWeek\": \"mon\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. POST - Create Core Block (Invalid - Wrong Enum Values)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Response has success false', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"});",
+									"",
+									"pm.test('Error mentions invalid enum value', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('Invalid enum value');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 2,\n  \"dayOfWeek\": \"invalid_day\",\n  \"shiftOfDay\": \"invalid_shift\",\n  \"timeStart\": 900,\n  \"timeEnd\": 1200,\n  \"numberOfEmployees\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. POST - Create Core Block (Empty Body)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400/404', function () {",
+									"    pm.expect([400,404]).to.include(pm.response.code)",
+									"});",
+									"",
+									"pm.test('Response has success false', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"});",
+									"",
+									"pm.test('Error message mentions empty body', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('Request body cannot be empty');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. GET - List All Core Blocks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has success true', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Response contains core blocks array', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.coreBlocks).to.be.an('array');",
+									"});",
+									"",
+									"pm.test('Core blocks contain required fields', function () {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.coreBlocks.length > 0) {",
+									"        const coreBlock = jsonData.coreBlocks[0];",
+									"        pm.expect(coreBlock).to.have.property('id');",
+									"        pm.expect(coreBlock).to.have.property('dayOfWeek');",
+									"        pm.expect(coreBlock).to.have.property('shiftOfDay');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6. GET - Filter by Day of Week",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('All returned blocks are for Monday', function () {",
+									"    const jsonData = pm.response.json();",
+									"    jsonData.coreBlocks.forEach(block => {",
+									"        pm.expect(block.dayOfWeek).to.eql('mon');",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks?dayOfWeek=mon",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							],
+							"query": [
+								{
+									"key": "dayOfWeek",
+									"value": "mon"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7. GET - Filter by Shift",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('All returned blocks are for m1 shift', function () {",
+									"    const jsonData = pm.response.json();",
+									"    jsonData.coreBlocks.forEach(block => {",
+									"        pm.expect(block.shiftOfDay).to.eql('m1');",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks?shiftOfDay=m1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							],
+							"query": [
+								{
+									"key": "shiftOfDay",
+									"value": "m1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "8. GET - Filter with Invalid Enum",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error mentions invalid enum value', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('Invalid enum value');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks?dayOfWeek=invalid_day",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							],
+							"query": [
+								{
+									"key": "dayOfWeek",
+									"value": "invalid_day"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "9. GET - Individual Core Block (Valid ID)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has success true', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Response contains core block data', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.coreBlocks).to.have.property('id');",
+									"    pm.expect(jsonData.coreBlocks.id).to.eql(parseInt(pm.collectionVariables.get('coreBlockId')));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks/{{coreBlockId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks",
+								"{{coreBlockId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "10. GET - Individual Core Block (Invalid ID)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 404', function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test('Response has success false', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"});",
+									"",
+									"pm.test('Error type is NOT_FOUND', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql('NOT_FOUND');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks",
+								"99999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "11. GET - Individual Core Block (Invalid ID Format)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error mentions invalid ID format', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('Invalid core block ID format');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks/invalid_id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks",
+								"invalid_id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "12. PUT - Update Core Block (Valid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has success true', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Number of employees was updated', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.coreBlocks.numberOfEmployees).to.eql(3);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numberOfEmployees\": 3,\n  \"timeEnd\": 1300\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks/{{coreBlockId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks",
+								"{{coreBlockId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "13. PUT - Update Core Block (Invalid ID)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 404', function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test('Error type is NOT_FOUND', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql('NOT_FOUND');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numberOfEmployees\": 3\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks",
+								"99999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "14. PUT - Update Core Block (Empty Body)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400/404', function () {",
+									"    pm.expect([400,404]).to.include(pm.response.code)",
+									"});",
+									"",
+									"pm.test('Error mentions empty body', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('Request body cannot be empty');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks/{{coreBlockId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks",
+								"{{coreBlockId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "15. DELETE - Delete Core Block (Valid ID)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has success true', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Message indicates deletion', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('deleted successfully');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks/{{coreBlockId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks",
+								"{{coreBlockId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "16. DELETE - Delete Core Block (Invalid ID)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 404', function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test('Error type is NOT_FOUND', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql('NOT_FOUND');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks",
+								"99999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "17. DELETE - Bulk Delete (Valid Parameters)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has success true', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Message indicates bulk deletion', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message.toLowerCase()).to.include('core blocks deleted');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks?dayOfWeek=tues&shiftOfDay=m1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							],
+							"query": [
+								{
+									"key": "dayOfWeek",
+									"value": "tues"
+								},
+								{
+									"key": "shiftOfDay",
+									"value": "m1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "18. DELETE - Bulk Delete (No Parameters)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400/404', function () {",
+									"    pm.expect([400, 404]).to.include(pm.response.code);",
+									"});",
+									"",
+									"pm.test('Error mentions missing parameters', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message.toLowerCase()).to.include('at least one parameter');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "coreBlockId",
+			"value": ""
+		}
+	]
+}

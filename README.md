@@ -78,7 +78,7 @@ This scheduling web application will be used by a small business to generate sch
     - [ ] Request Validation
       - [x] User validation schemas (create, update, role changes)
       - [x] Core block validation schemas (time blocks, employee requirements)
-      - [ ] Shift validation schemas (assignments, tips, dates)
+      - [x] Shift validation schemas (assignments, tips, dates)
       - [x] Availability validation schemas (preferences, exceptions)
     - [ ] Response Validation
       - [ ] User validation
@@ -114,11 +114,16 @@ This scheduling web application will be used by a small business to generate sch
     - [x] `DELETE /api/exceptions/[id]` - Remove exception
     - [x] `GET /api/exceptions/[id]` - Get singular exception
 
-  - [ ] Shift Management API Routes
-    - [ ] `GET /api/shifts` - Get shifts with date/user filtering
-    - [ ] `POST /api/shifts` - Create/assign new shift
-    - [ ] `PUT /api/shifts/[id]` - Update shift details and tips
-    - [ ] `DELETE /api/shifts/[id]` - Remove shift assignment
+  - [x] Shift Management API Routes
+    - [x] `GET /api/shifts` - Get shifts with date/user filtering and pagination
+    - [x] `POST /api/shifts` - Create/assign new shift
+    - [x] `GET /api/shifts/[id]` - Get individual shift with core block details and assigned users
+    - [x] `PUT /api/shifts/[id]` - Update shift details (date, tips)
+    - [x] `DELETE /api/shifts/[id]` - Remove shift assignment
+    - [x] `GET /api/shifts/[id]/users` - Get all users assigned to a specific shift
+    - [x] `POST /api/shifts/[id]/users` - Assign multiple users to a shift
+    - [x] `PUT /api/shifts/[id]/users` - Replace all users assigned to a shift
+    - [x] `DELETE /api/shifts/[id]/users` - Remove all users from a shift
 
   - [ ] Reporting API Routes
     - [ ] `GET /api/reports/tips/[userId]` - Tips earned by user over period
