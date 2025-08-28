@@ -125,10 +125,10 @@ This scheduling web application will be used by a small business to generate sch
     - [x] `PUT /api/shifts/[id]/users` - Replace all users assigned to a shift
     - [x] `DELETE /api/shifts/[id]/users` - Remove all users from a shift
 
-  - [ ] Reporting API Routes
-    - [ ] `GET /api/reports/tips/[userId]` - Tips earned by user over period
-    - [ ] `GET /api/reports/hours/[userId]` - Hours worked by user over period
-    - [ ] `GET /api/reports/schedule-history` - Historical schedule data
+  - [x] Reporting API Routes
+    - [x] `GET /api/reports/tips/[userId]` - Tips earned by user over period
+    - [x] `GET /api/reports/hours/[userId]` - Hours worked by user over period
+    - [x] `GET /api/reports/schedule-history` - Historical schedule data
 
 - [ ] **Scheduling Engine** (Business Logic)
   - [ ] Set up Zod schemas for request/response validation
