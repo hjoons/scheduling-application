@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { db } from "~/server/db";
 import { coreBlocks } from "~/server/db/schemas";
 import {
@@ -7,7 +7,8 @@ import {
 } from "~/lib/requests";
 import { eq, and } from "drizzle-orm";
 import { handleAPIError } from "~/lib/errors/error-handler";
-import { NotFoundError, ValidationError } from "~/lib/errors/";
+import { ValidationError } from "~/lib/errors/";
+import type { APIError } from "~/lib/errors";
 
 // GET /api/core-blocks - List core blocks via query parameters
 export async function GET(request: NextRequest) {
@@ -48,12 +49,12 @@ export async function GET(request: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    const apiError = handleAPIError(error);
+    const apiError: APIError = handleAPIError(error);
 
     return Response.json(
       {
         success: false,
-        message: "Core blocks retrieval failed",
+        message: "Failed to retrieve core blocks",
         coreBlocks: null,
         error: {
           type: apiError.type,
@@ -66,11 +67,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/core-blocks/[id] - Create ONE core block with a specific "{day}-{block}" id
+// POST /api/core-blocks - Create ONE core block with a specific "{day}-{block}" id
 // Endpoint is different from generic POST because it requires a specific day and block
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as unknown;
 
     if (!body || Object.keys(body).length === 0) {
       throw new ValidationError("Request body cannot be empty");
@@ -88,19 +89,19 @@ export async function POST(request: NextRequest) {
       {
         success: true,
         message: "Core block created successfully",
-        coreBlocks: newCoreBlock[0],
+        coreBlock: newCoreBlock[0],
         error: null,
       },
       { status: 201 },
     );
   } catch (error) {
-    const apiError = handleAPIError(error);
+    const apiError: APIError = handleAPIError(error);
 
     return Response.json(
       {
         success: false,
-        message: "Core block creation failed",
-        coreBlocks: null,
+        message: "Failed to create core block",
+        coreBlock: null,
         error: {
           type: apiError.type,
           message: apiError.message,
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE /api/core-blocks/ - Delete all core blocks of a specific day or shift
+// DELETE /api/core-blocks - Delete all core blocks of a specific day or shift
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -125,7 +126,7 @@ export async function DELETE(request: NextRequest) {
     const queryParams = GetCoreBlocksQuerySchema.parse(rawParams);
 
     if (!queryParams.dayOfWeek && !queryParams.shiftOfDay) {
-      throw new NotFoundError(
+      throw new ValidationError(
         "Requires at least one parameter: dayOfWeek or shiftOfDay",
       );
     }
@@ -147,21 +148,19 @@ export async function DELETE(request: NextRequest) {
     return Response.json(
       {
         success: true,
-        message: deletedCoreBlocks
-          ? `Core blocks deleted for day of the week ${queryParams.dayOfWeek} and shift of the day ${queryParams.shiftOfDay}`
-          : "No changes made",
-        coreBlocks: deletedCoreBlocks ?? null,
+        message: `Deleted ${deletedCoreBlocks.length} core blocks successfully`,
+        coreBlocks: deletedCoreBlocks,
         error: null,
       },
       { status: 200 },
     );
   } catch (error) {
-    const apiError = handleAPIError(error);
+    const apiError: APIError = handleAPIError(error);
 
     return Response.json(
       {
         success: false,
-        message: "Core block deletion failed",
+        message: "Failed to delete core blocks",
         coreBlocks: null,
         error: {
           type: apiError.type,

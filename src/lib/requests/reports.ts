@@ -17,6 +17,7 @@ export const DateRangeReportSchema = z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, "End date must be in YYYY-MM-DD format"),
   })
+  .strict()
   .refine((data) => new Date(data.startDate) <= new Date(data.endDate), {
     message: "Start date cannot be after end date",
     path: ["startDate"],
@@ -32,6 +33,7 @@ export const ScheduleHistoryQuerySchema = z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, "End date must be in YYYY-MM-DD format"),
   })
+  .strict()
   .refine((data) => new Date(data.startDate) <= new Date(data.endDate), {
     message: "Start date cannot be after end date",
     path: ["startDate"],

@@ -1,11 +1,11 @@
 {
 	"info": {
-		"_postman_id": "0bfac496-f603-48e1-a39f-fd6c103dcf5f",
+		"_postman_id": "591de2d7-886d-42a5-aab0-aca85a0cd779",
 		"name": "Core Blocks API (Local)",
 		"description": "CRUD operations for Core Blocks with positive and negative test cases",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "47432747",
-		"_collection_link": "https://hjoons-6329250.postman.co/workspace/UTP's-Workspace~7992f774-284a-465c-853d-da3e8b07920d/collection/47432747-0bfac496-f603-48e1-a39f-fd6c103dcf5f?action=share&source=collection_link&creator=47432747"
+		"_collection_link": "https://hjoons-6329250.postman.co/workspace/UTP's-Workspace~7992f774-284a-465c-853d-da3e8b07920d/collection/47432747-591de2d7-886d-42a5-aab0-aca85a0cd779?action=share&source=collection_link&creator=47432747"
 	},
 	"item": [
 		{
@@ -29,15 +29,15 @@
 									"",
 									"pm.test('Response contains core block data', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.coreBlocks).to.have.property('id');",
-									"    pm.expect(jsonData.coreBlocks.dayOfWeek, 'mon');",
-									"    pm.expect(jsonData.coreBlocks.shiftOfDay, 'm1');",
+									"    pm.expect(jsonData.coreBlock).to.have.property('id');",
+									"    pm.expect(jsonData.coreBlock.dayOfWeek, 'mon');",
+									"    pm.expect(jsonData.coreBlock.shiftOfDay, 'm1');",
 									"});",
 									"",
 									"// Save core block ID for other tests",
 									"if (pm.response.code === 201) {",
 									"    const jsonData = pm.response.json();",
-									"    pm.collectionVariables.set('coreBlockId', jsonData.coreBlocks.id);",
+									"    pm.collectionVariables.set('coreBlockId', jsonData.coreBlock.id);",
 									"}"
 								],
 								"type": "text/javascript",
@@ -420,8 +420,8 @@
 									"",
 									"pm.test('Response contains core block data', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.coreBlocks).to.have.property('id');",
-									"    pm.expect(jsonData.coreBlocks.id).to.eql(parseInt(pm.collectionVariables.get('coreBlockId')));",
+									"    pm.expect(jsonData.coreBlock).to.have.property('id');",
+									"    pm.expect(jsonData.coreBlock.id).to.eql(parseInt(pm.collectionVariables.get('coreBlockId')));",
 									"});"
 								],
 								"type": "text/javascript",
@@ -544,7 +544,7 @@
 									"",
 									"pm.test('Number of employees was updated', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.coreBlocks.numberOfEmployees).to.eql(3);",
+									"    pm.expect(jsonData.coreBlock.numberOfEmployees).to.eql(3);",
 									"});"
 								],
 								"type": "text/javascript",
@@ -770,7 +770,8 @@
 									"",
 									"pm.test('Message indicates bulk deletion', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message.toLowerCase()).to.include('core blocks deleted');",
+									"    pm.expect(jsonData.message.toLowerCase()).to.include('deleted');",
+									"    pm.expect(jsonData.message.toLowerCase()).to.include('core blocks successfully');",
 									"});"
 								],
 								"type": "text/javascript",

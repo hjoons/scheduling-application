@@ -1,80 +1,40 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { db } from "~/server/db";
-import { shifts, users, coreBlocks, user_shifts } from "~/server/db/schemas";
+import { shifts } from "~/server/db/schemas";
 import { UpdateShiftRequestSchema } from "~/lib/requests";
 import { eq } from "drizzle-orm";
 import { handleAPIError } from "~/lib/errors/error-handler";
 import { ValidationError, NotFoundError } from "~/lib/errors/";
+import type { APIError } from "~/lib/errors";
+import {
+  getShiftWithDetails,
+  formatSingleShiftWithDetailsResponse,
+} from "~/lib/database/shift";
 
 // GET /api/shifts/[id] - Get shift information with assigned users by ID
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } },
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
     const shiftId = parseInt(id);
 
     if (isNaN(shiftId) || shiftId <= 0) {
       throw new ValidationError("Invalid shift ID");
     }
 
-    // Get shift with core block data and assigned users
-    const shiftWithDetails = await db
-      .select({
-        // Shift data
-        shiftId: shifts.id,
-        coreId: shifts.coreId,
-        date: shifts.date,
-        tipsEarned: shifts.tipsEarned,
-
-        // Core block data
-        timeStart: coreBlocks.timeStart,
-        timeEnd: coreBlocks.timeEnd,
-        dayOfWeek: coreBlocks.dayOfWeek,
-        shiftOfDay: coreBlocks.shiftOfDay,
-        numberOfEmployees: coreBlocks.numberOfEmployees,
-
-        // User data (from junction table) - ALL users for qualifying shifts
-        userId: users.id,
-        firstName: users.firstName,
-        lastName: users.lastName,
-        role: users.role,
-      })
-      .from(shifts)
-      .leftJoin(coreBlocks, eq(shifts.coreId, coreBlocks.id))
-      .leftJoin(user_shifts, eq(shifts.id, user_shifts.shiftId))
-      .leftJoin(users, eq(user_shifts.userId, users.id))
-      .where(eq(shifts.id, shiftId));
+    // Get shift with core block data and assigned users using shared function
+    const shiftWithDetails = await getShiftWithDetails([
+      eq(shifts.id, shiftId),
+    ]);
 
     if (shiftWithDetails.length === 0) {
       throw new NotFoundError(`Shift with ID ${shiftId} not found`);
     }
 
-    // Structure the response data
-    const shiftData = shiftWithDetails[0]!;
-    const assignedUsers = shiftWithDetails
-      .filter((row) => row.userId !== null)
-      .map((row) => ({
-        id: row.userId,
-        firstName: row.firstName,
-        lastName: row.lastName,
-        role: row.role,
-      }));
-
-    const formattedShift = {
-      id: shiftData.shiftId,
-      coreId: shiftData.coreId,
-      date: shiftData.date,
-      tipsEarned: shiftData.tipsEarned,
-      timeStart: shiftData.timeStart,
-      timeEnd: shiftData.timeEnd,
-      dayOfWeek: shiftData.dayOfWeek,
-      shiftOfDay: shiftData.shiftOfDay,
-      numberOfEmployees: shiftData.numberOfEmployees,
-      users: assignedUsers,
-      totalAssignedUsers: assignedUsers.length,
-    };
+    const formattedShift =
+      formatSingleShiftWithDetailsResponse(shiftWithDetails);
 
     return Response.json(
       {
@@ -86,7 +46,7 @@ export async function GET(
       { status: 200 },
     );
   } catch (error) {
-    const apiError = handleAPIError(error);
+    const apiError: APIError = handleAPIError(error);
 
     return Response.json(
       {
@@ -107,17 +67,17 @@ export async function GET(
 // PUT /api/shifts/[id] - Update shift details (not user assignments)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
     const shiftId = parseInt(id);
 
     if (isNaN(shiftId) || shiftId <= 0) {
       throw new ValidationError("Invalid shift ID");
     }
 
-    const body = await request.json();
+    const body = (await request.json()) as unknown;
 
     if (!body || Object.keys(body).length === 0) {
       throw new ValidationError("Request body cannot be empty");
@@ -137,63 +97,12 @@ export async function PUT(
       throw new NotFoundError(`Shift with ID ${shiftId} not found`);
     }
 
-    const shiftWithDetails = await db
-      .select({
-        // Shift data
-        shiftId: shifts.id,
-        coreId: shifts.coreId,
-        date: shifts.date,
-        tipsEarned: shifts.tipsEarned,
-
-        // Core block data
-        timeStart: coreBlocks.timeStart,
-        timeEnd: coreBlocks.timeEnd,
-        dayOfWeek: coreBlocks.dayOfWeek,
-        shiftOfDay: coreBlocks.shiftOfDay,
-        numberOfEmployees: coreBlocks.numberOfEmployees,
-
-        // User data
-        userId: users.id,
-        firstName: users.firstName,
-        lastName: users.lastName,
-        email: users.email,
-        role: users.role,
-      })
-      .from(shifts)
-      .leftJoin(coreBlocks, eq(shifts.coreId, coreBlocks.id))
-      .leftJoin(user_shifts, eq(shifts.id, user_shifts.shiftId))
-      .leftJoin(users, eq(user_shifts.userId, users.id))
-      .where(eq(shifts.id, shiftId));
-
-    if (shiftWithDetails.length === 0) {
-      throw new NotFoundError(`Shift with ID ${shiftId} not found`);
-    }
-
-    // Structure the response data (same format as GET)
-    const shiftData = shiftWithDetails[0]!;
-    const assignedUsers = shiftWithDetails
-      .filter((row) => row.userId !== null)
-      .map((row) => ({
-        id: row.userId,
-        firstName: row.firstName,
-        lastName: row.lastName,
-        email: row.email,
-        role: row.role,
-      }));
-
-    const formattedShift = {
-      id: shiftData.shiftId,
-      coreId: shiftData.coreId,
-      date: shiftData.date,
-      tipsEarned: shiftData.tipsEarned,
-      timeStart: shiftData.timeStart,
-      timeEnd: shiftData.timeEnd,
-      dayOfWeek: shiftData.dayOfWeek,
-      shiftOfDay: shiftData.shiftOfDay,
-      numberOfEmployees: shiftData.numberOfEmployees,
-      users: assignedUsers,
-      totalAssignedUsers: assignedUsers.length,
-    };
+    // Get updated shift with details using shared function
+    const shiftWithDetails = await getShiftWithDetails([
+      eq(shifts.id, shiftId),
+    ]);
+    const formattedShift =
+      formatSingleShiftWithDetailsResponse(shiftWithDetails);
 
     return Response.json(
       {
@@ -205,7 +114,7 @@ export async function PUT(
       { status: 200 },
     );
   } catch (error) {
-    const apiError = handleAPIError(error);
+    const apiError: APIError = handleAPIError(error);
 
     return Response.json(
       {
@@ -225,11 +134,11 @@ export async function PUT(
 
 // DELETE /api/shifts/[id] - Delete shift and all user assignments
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } },
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
     const shiftId = parseInt(id);
 
     if (isNaN(shiftId) || shiftId <= 0) {
@@ -249,20 +158,18 @@ export async function DELETE(
     return Response.json(
       {
         success: true,
-        message: `Shift ${shiftId} deleted successfully.`,
-        shift: deletedShift[0],
+        message: `Shift ${shiftId} deleted successfully`,
         error: null,
       },
       { status: 200 },
     );
   } catch (error) {
-    const apiError = handleAPIError(error);
+    const apiError: APIError = handleAPIError(error);
 
     return Response.json(
       {
         success: false,
         message: "Failed to delete shift",
-        shift: null,
         error: {
           type: apiError.type,
           message: apiError.message,

@@ -1,18 +1,19 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { db } from "~/server/db";
 import { shifts, users, user_shifts, coreBlocks } from "~/server/db/schemas";
 import { DateRangeReportSchema } from "~/lib/requests";
 import { eq, and, gte, lte } from "drizzle-orm";
 import { handleAPIError } from "~/lib/errors/error-handler";
-import { ValidationError } from "~/lib/errors/";
+import { NotFoundError } from "~/lib/errors/";
+import type { APIError } from "~/lib/errors";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } },
+  context: { params: Promise<{ userId: string }> },
 ) {
   try {
     const { searchParams } = new URL(request.url);
-    const { userId } = await params;
+    const { userId } = await context.params;
 
     // Validate parameters
     const validatedParams = DateRangeReportSchema.parse({
@@ -20,6 +21,22 @@ export async function GET(
       startDate: searchParams.get("startDate"),
       endDate: searchParams.get("endDate"),
     });
+
+    // First, verify user exists
+    const userCheck = await db
+      .select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+      })
+      .from(users)
+      .where(eq(users.id, validatedParams.userId));
+
+    if (userCheck.length === 0) {
+      throw new NotFoundError(
+        `User with ID ${validatedParams.userId} not found`,
+      );
+    }
 
     // Single database call with JOINs to get all hours data
     const hoursData = await db
@@ -48,21 +65,6 @@ export async function GET(
         ),
       )
       .orderBy(shifts.date);
-
-    // Check if user exists if no data found
-    if (hoursData.length === 0) {
-      const userExists = await db
-        .select({ id: users.id })
-        .from(users)
-        .where(eq(users.id, validatedParams.userId))
-        .limit(1);
-
-      if (userExists.length === 0) {
-        throw new ValidationError(
-          `User with ID ${validatedParams.userId} not found`,
-        );
-      }
-    }
 
     // Calculate hours for each shift and totals
     const shiftsWithHours = hoursData.map((shift) => {
@@ -94,12 +96,12 @@ export async function GET(
       0,
     );
     const totalShifts = shiftsWithHours.length;
-
     // Format response
+
     const hoursReport = {
       userId: validatedParams.userId,
-      firstName: hoursData.length > 0 ? hoursData[0]?.firstName : null,
-      lastName: hoursData.length > 0 ? hoursData[0]?.lastName : null,
+      firstName: userCheck[0]!.firstName,
+      lastName: userCheck[0]!.lastName,
       period: {
         startDate: validatedParams.startDate,
         endDate: validatedParams.endDate,
@@ -114,14 +116,17 @@ export async function GET(
     return Response.json(
       {
         success: true,
-        message: "Hours report generated successfully",
+        message:
+          hoursData.length > 0
+            ? "Hours report generated successfully"
+            : "No shifts found for the specified user and date range",
         report: hoursReport,
         error: null,
       },
       { status: 200 },
     );
   } catch (error) {
-    const apiError = handleAPIError(error);
+    const apiError: APIError = handleAPIError(error);
     return Response.json(
       {
         success: false,

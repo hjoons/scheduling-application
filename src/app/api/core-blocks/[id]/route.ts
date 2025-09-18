@@ -1,18 +1,19 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { db } from "~/server/db";
 import { coreBlocks } from "~/server/db/schemas";
 import { UpdateCoreBlockRequestSchema } from "~/lib/requests";
 import { eq } from "drizzle-orm";
 import { handleAPIError } from "~/lib/errors/error-handler";
 import { NotFoundError, ValidationError } from "~/lib/errors/";
+import type { APIError } from "~/lib/errors";
 
 // GET /api/core-blocks/[id] - GET ONE core block
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } },
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
     const coreId = Number(id);
 
     if (isNaN(coreId) || coreId <= 0) {
@@ -32,19 +33,19 @@ export async function GET(
       {
         success: true,
         message: "Core block retrieved successfully",
-        coreBlocks: coreBlock[0],
+        coreBlock: coreBlock[0],
         error: null,
       },
       { status: 200 },
     );
   } catch (error) {
-    const apiError = handleAPIError(error);
+    const apiError: APIError = handleAPIError(error);
 
     return Response.json(
       {
         success: false,
-        message: "Retrieving core block failed",
-        coreBlocks: null,
+        message: "Failed to retrieve core block",
+        coreBlock: null,
         error: {
           type: apiError.type,
           message: apiError.message,
@@ -59,17 +60,17 @@ export async function GET(
 // PUT /api/core-blocks/[id] - Update ONE core block
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
     const coreId = Number(id);
 
     if (isNaN(coreId) || coreId <= 0) {
       throw new ValidationError("Core block ID must be a number");
     }
 
-    const body = await request.json();
+    const body = (await request.json()) as unknown;
 
     if (!body || Object.keys(body).length === 0) {
       throw new ValidationError("Request body cannot be empty");
@@ -91,22 +92,20 @@ export async function PUT(
     return Response.json(
       {
         success: true,
-        message: updatedCoreBlock
-          ? `Core block with ID ${coreId} has been updated`
-          : "No changes made",
-        coreBlocks: updatedCoreBlock[0],
+        message: "Core block updated successfully",
+        coreBlock: updatedCoreBlock[0],
         error: null,
       },
       { status: 200 },
     );
   } catch (error) {
-    const apiError = handleAPIError(error);
+    const apiError: APIError = handleAPIError(error);
 
     return Response.json(
       {
         success: false,
-        message: "Core block update failed",
-        coreBlocks: null,
+        message: "Failed to update core block",
+        coreBlock: null,
         error: {
           type: apiError.type,
           message: apiError.message,
@@ -120,11 +119,11 @@ export async function PUT(
 
 // DELETE /api/core-blocks/[id] - Delete ONE core block
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } },
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
     const coreId = Number(id);
 
     if (isNaN(coreId) || coreId <= 0) {
@@ -144,20 +143,20 @@ export async function DELETE(
     return Response.json(
       {
         success: true,
-        message: `Core block with ID ${coreId} was deleted successfully`,
-        coreBlocks: null,
+        message: "Core block deleted successfully",
+        coreBlock: deletedCoreBlock[0],
         error: null,
       },
       { status: 200 },
     );
   } catch (error) {
-    const apiError = handleAPIError(error);
+    const apiError: APIError = handleAPIError(error);
 
     return Response.json(
       {
         success: false,
-        message: "Core block deletion failed",
-        coreBlocks: null,
+        message: "Failed to delete core block",
+        coreBlock: null,
         error: {
           type: apiError.type,
           message: apiError.message,

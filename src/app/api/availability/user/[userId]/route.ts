@@ -1,22 +1,26 @@
 import type { NextRequest } from "next/server";
 import { db } from "~/server/db";
-import { availabilities, coreBlocks } from "~/server/db/schemas";
+import type { z } from "zod";
+import { users, availabilities, coreBlocks } from "~/server/db/schemas";
 import {
   GetUserAvailabilityQuerySchema,
   CreateAvailabilityRequestSchema,
+  RequestBodySchema,
 } from "~/lib/requests/availability";
+import type { RequestEntrySchema } from "~/lib/requests/availability";
 import { handleAPIError } from "~/lib/errors/error-handler";
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import { NotFoundError, ValidationError } from "~/lib/errors";
-import { number } from "zod/v4";
+import type { APIError } from "~/lib/errors";
+import type { BaseAvailabilitySchema } from "~/lib/requests/availability";
 
 // GET /api/availability/user/[userId] - Query user availability
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } },
+  context: { params: Promise<{ userId: string }> },
 ) {
   try {
-    const { userId } = await params;
+    const { userId } = await context.params;
     const { searchParams } = new URL(request.url);
 
     // Get query parameters
@@ -31,6 +35,15 @@ export async function GET(
 
     if (isNaN(userIdInt) || userIdInt <= 0) {
       throw new ValidationError("Invalid user ID");
+    }
+
+    const userValidation = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userIdInt));
+
+    if (userValidation.length === 0) {
+      throw new NotFoundError(`User with ID ${userIdInt} not found`);
     }
 
     // Build dynamic WHERE conditions
@@ -54,24 +67,23 @@ export async function GET(
         numberOfEmployees: coreBlocks.numberOfEmployees,
       })
       .from(availabilities)
-      .fullJoin(coreBlocks, eq(availabilities.coreId, coreBlocks.id))
+      .innerJoin(coreBlocks, eq(availabilities.coreId, coreBlocks.id))
       .where(and(eq(availabilities.userId, userIdInt), ...conditions));
-
-    if (availabilitiesList.length === 0) {
-      throw new NotFoundError(`Invalid user ID or no availability found`);
-    }
 
     return Response.json(
       {
         success: true,
-        message: "User availability retrieved successfully",
+        message:
+          availabilitiesList.length > 0
+            ? "User availability retrieved successfully"
+            : "No availability found",
         availabilities: availabilitiesList,
         error: null,
       },
       { status: 200 },
     );
   } catch (error) {
-    const apiError = handleAPIError(error);
+    const apiError: APIError = handleAPIError(error);
 
     return Response.json(
       {
@@ -92,31 +104,37 @@ export async function GET(
 // POST /api/availability/user/[userId] - Set availability for a user using a list of availability entries
 export async function POST(
   request: NextRequest,
-  { params }: { params: { userId: string } },
+  context: { params: Promise<{ userId: string }> },
 ) {
   try {
-    const { userId } = await params;
-    const body = await request.json();
-    if (
-      !body ||
-      Object.keys(body).length === 0 ||
-      body.availability.length === 0
-    ) {
+    const { userId } = await context.params;
+    const body = (await request.json()) as unknown;
+
+    if (!body || Object.keys(body).length === 0) {
       throw new ValidationError("Request body cannot be empty");
     }
 
-    // Insert new availability entries into the database
     const userIdInt = parseInt(userId);
     if (isNaN(userIdInt) || userIdInt <= 0) {
       throw new ValidationError("Invalid user ID");
     }
 
-    // Add userId to each availability entry before validation
+    const validatedBody = RequestBodySchema.parse(body);
+
+    if (validatedBody.availability.length === 0) {
+      throw new ValidationError("Availability array cannot be empty");
+    }
+
+    // Add userId to each availability entry
     const bodyWithUserIds = {
-      availability: body.availability.map((entry: any) => ({
-        ...entry,
-        userId: userIdInt,
-      })),
+      availability: validatedBody.availability.map(
+        (
+          entry: z.infer<typeof RequestEntrySchema>,
+        ): z.infer<typeof BaseAvailabilitySchema> => ({
+          ...entry,
+          userId: userIdInt,
+        }),
+      ),
     };
 
     // Validate request body with userId included
@@ -143,6 +161,24 @@ export async function POST(
       newAvailabilities.length > 0 && skippedEntries.length === 0;
     const isCompleteFailure = newAvailabilities.length === 0;
 
+    const availabilitiesWithDetails = await db
+      .select({
+        coreId: coreBlocks.id,
+        dayOfWeek: coreBlocks.dayOfWeek,
+        shiftOfDay: coreBlocks.shiftOfDay,
+        timeStart: coreBlocks.timeStart,
+        timeEnd: coreBlocks.timeEnd,
+        numberOfEmployees: coreBlocks.numberOfEmployees,
+      })
+      .from(availabilities)
+      .innerJoin(coreBlocks, eq(availabilities.coreId, coreBlocks.id))
+      .where(
+        inArray(
+          availabilities.id,
+          newAvailabilities.map((a) => a.id),
+        ),
+      );
+
     return Response.json(
       {
         success: isCompleteSuccess || isPartialSuccess,
@@ -151,8 +187,7 @@ export async function POST(
           : isPartialSuccess
             ? `Partial success: ${newAvailabilities.length} created, ${skippedEntries.length} skipped (duplicates)`
             : "No availability could be created (all duplicates or invalid)",
-        availabilities: newAvailabilities,
-        skipped: skippedEntries,
+        availabilities: availabilitiesWithDetails,
         error: null,
       },
       {
@@ -167,7 +202,6 @@ export async function POST(
         success: false,
         message: "Availability creation failed",
         availabilities: null,
-        skipped: null,
         error: {
           type: apiError.type,
           message: apiError.message,
@@ -182,27 +216,32 @@ export async function POST(
 // PUT /api/availability/user/[userId] - Update availability for a user using a list of availability entries
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { userId: string } },
+  context: { params: Promise<{ userId: string }> },
 ) {
   try {
-    const { userId } = await params;
-    const body = await request.json();
+    const { userId } = await context.params;
+    const body = (await request.json()) as unknown;
+    if (!body || Object.keys(body).length === 0) {
+      throw new ValidationError("Request body cannot be empty");
+    }
 
     const userIdInt = parseInt(userId);
     if (isNaN(userIdInt) || userIdInt <= 0) {
       throw new ValidationError("Invalid user ID");
     }
 
-    if (!body || Object.keys(body).length === 0) {
-      throw new ValidationError("Request body cannot be empty");
-    }
+    const validatedBody = RequestBodySchema.parse(body);
 
-    // Add userId to each availability entry before validation
+    // Add userId to each availability entry
     const bodyWithUserIds = {
-      availability: body.availability.map((entry: any) => ({
-        ...entry,
-        userId: userIdInt,
-      })),
+      availability: validatedBody.availability.map(
+        (
+          entry: z.infer<typeof RequestEntrySchema>,
+        ): z.infer<typeof BaseAvailabilitySchema> => ({
+          ...entry,
+          userId: userIdInt,
+        }),
+      ),
     };
 
     // Validate request body - expecting { coreId: number } per entry
@@ -216,11 +255,29 @@ export async function PUT(
       .values(availabilityData.availability)
       .returning();
 
+    const availabilitiesWithDetails = await db
+      .select({
+        coreId: coreBlocks.id,
+        dayOfWeek: coreBlocks.dayOfWeek,
+        shiftOfDay: coreBlocks.shiftOfDay,
+        timeStart: coreBlocks.timeStart,
+        timeEnd: coreBlocks.timeEnd,
+        numberOfEmployees: coreBlocks.numberOfEmployees,
+      })
+      .from(availabilities)
+      .innerJoin(coreBlocks, eq(availabilities.coreId, coreBlocks.id))
+      .where(
+        inArray(
+          availabilities.id,
+          updatedAvailabilities.map((a) => a.id),
+        ),
+      );
+
     return Response.json(
       {
         success: true,
         message: `Successfully updated ${updatedAvailabilities.length} availability records for user `,
-        availabilities: updatedAvailabilities,
+        availabilities: availabilitiesWithDetails,
         error: null,
       },
       { status: 200 },
@@ -246,19 +303,32 @@ export async function PUT(
 
 // DELETE /api/availability/user/[userId] - Remove all availability from a user (reset)
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { userId: string } },
+  _request: NextRequest,
+  context: { params: Promise<{ userId: string }> },
 ) {
   try {
-    const { userId } = await params;
+    const { userId } = await context.params;
     const userIdInt = parseInt(userId);
 
     if (isNaN(userIdInt) || userIdInt <= 0) {
       throw new ValidationError("Invalid user ID");
     }
 
+    const availabilitiesWithDetails = await db
+      .select({
+        coreId: coreBlocks.id,
+        dayOfWeek: coreBlocks.dayOfWeek,
+        shiftOfDay: coreBlocks.shiftOfDay,
+        timeStart: coreBlocks.timeStart,
+        timeEnd: coreBlocks.timeEnd,
+        numberOfEmployees: coreBlocks.numberOfEmployees,
+      })
+      .from(availabilities)
+      .innerJoin(coreBlocks, eq(availabilities.coreId, coreBlocks.id))
+      .where(eq(availabilities.userId, userIdInt));
+
     // Delete all availability entries for the user
-    const deletedCount = await db
+    const deletedAvailabilities = await db
       .delete(availabilities)
       .where(eq(availabilities.userId, userIdInt))
       .returning();
@@ -266,8 +336,8 @@ export async function DELETE(
     return Response.json(
       {
         success: true,
-        message: `Deleted ${deletedCount.length} availability records successfully`,
-        availabilities: deletedCount,
+        message: `Deleted ${deletedAvailabilities.length} availability records successfully`,
+        availabilities: availabilitiesWithDetails,
         error: null,
       },
       { status: 200 },

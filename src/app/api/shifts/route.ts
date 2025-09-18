@@ -1,10 +1,17 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { db } from "~/server/db";
-import { shifts, users, coreBlocks, user_shifts } from "~/server/db/schemas";
+import { shifts, user_shifts } from "~/server/db/schemas";
 import { CreateShiftRequestSchema, GetShiftsQuerySchema } from "~/lib/requests";
 import { eq, and, gte, lte, inArray } from "drizzle-orm";
 import { handleAPIError } from "~/lib/errors/error-handler";
-import { ValidationError, NotFoundError } from "~/lib/errors/";
+import { ValidationError } from "~/lib/errors/";
+import type { APIError } from "~/lib/errors";
+import {
+  getShiftWithDetails,
+  getShiftWithCoreBlocks,
+  formatShiftWithDetailsResponse,
+  formatSingleShiftWithCoreBlocksResponse,
+} from "~/lib/database/shift";
 
 // GET /api/shifts - List shifts with optional filtering
 export async function GET(request: NextRequest) {
@@ -51,7 +58,6 @@ export async function GET(request: NextRequest) {
     }
 
     // If filtering by userId, first find shifts that include this user
-    let shiftIdsWithUser: number[] = [];
     if (queryParams.userId) {
       const shiftsForUser = await db
         .select({ shiftId: user_shifts.shiftId })
@@ -59,22 +65,17 @@ export async function GET(request: NextRequest) {
         .innerJoin(shifts, eq(user_shifts.shiftId, shifts.id))
         .where(and(eq(user_shifts.userId, queryParams.userId), ...conditions));
 
-      shiftIdsWithUser = shiftsForUser
+      const shiftIdsWithUser = shiftsForUser
         .map((row) => row.shiftId)
         .filter((id): id is number => id !== null);
 
-      // If no shifts found for this user, return empty result early
+      // If no shifts found for this user, return empty result
       if (shiftIdsWithUser.length === 0) {
         return Response.json(
           {
             success: true,
             message: `No shifts found for user ID ${queryParams.userId}`,
             shifts: [],
-            filters: {
-              userId: queryParams.userId,
-              startDate: queryParams.startDate ?? null,
-              endDate: queryParams.endDate ?? null,
-            },
             error: null,
           },
           { status: 200 },
@@ -85,69 +86,8 @@ export async function GET(request: NextRequest) {
       conditions.push(inArray(shifts.id, shiftIdsWithUser));
     }
 
-    // Get all shift data for the filtered shifts (including ALL users assigned to each shift)
-    const shiftsList = await db
-      .select({
-        // Shift data
-        shiftId: shifts.id,
-        coreId: shifts.coreId,
-        date: shifts.date,
-        tipsEarned: shifts.tipsEarned,
-
-        // Core block data
-        timeStart: coreBlocks.timeStart,
-        timeEnd: coreBlocks.timeEnd,
-        dayOfWeek: coreBlocks.dayOfWeek,
-        shiftOfDay: coreBlocks.shiftOfDay,
-        numberOfEmployees: coreBlocks.numberOfEmployees,
-
-        // User data (from junction table) - ALL users for qualifying shifts
-        userId: users.id,
-        firstName: users.firstName,
-        lastName: users.lastName,
-        role: users.role,
-      })
-      .from(shifts)
-      .leftJoin(coreBlocks, eq(shifts.coreId, coreBlocks.id))
-      .leftJoin(user_shifts, eq(shifts.id, user_shifts.shiftId))
-      .leftJoin(users, eq(user_shifts.userId, users.id))
-      .where(and(...conditions));
-
-    // Group results by shift to handle multiple users per shift
-    const shiftsMap = new Map();
-
-    shiftsList.forEach((row) => {
-      // Initialize shift if not exists
-      if (!shiftsMap.has(row.shiftId)) {
-        shiftsMap.set(row.shiftId, {
-          id: row.shiftId,
-          coreId: row.coreId,
-          date: row.date,
-          tipsEarned: row.tipsEarned,
-          timeStart: row.timeStart,
-          timeEnd: row.timeEnd,
-          dayOfWeek: row.dayOfWeek,
-          shiftOfDay: row.shiftOfDay,
-          numberOfemployees: row.numberOfEmployees,
-          users: [],
-          totalAssignedUsers: 0,
-        });
-      }
-
-      // Add user to the shift if user data exists (some shifts might have no assigned users)
-      if (row.userId) {
-        const shift = shiftsMap.get(row.shiftId);
-        shift.users.push({
-          id: row.userId,
-          firstName: row.firstName,
-          lastName: row.lastName,
-          role: row.role,
-        });
-        shift.totalAssignedUsers = shift.users.length;
-      }
-    });
-
-    const shiftsWithUsers = Array.from(shiftsMap.values());
+    const shiftsList = await getShiftWithDetails(conditions);
+    const shiftsWithUsers = formatShiftWithDetailsResponse(shiftsList) ?? [];
 
     const dateRangeMessage =
       queryParams.startDate && queryParams.endDate
@@ -158,12 +98,7 @@ export async function GET(request: NextRequest) {
       ? ` for user ID ${queryParams.userId}`
       : "";
 
-    if (shiftsWithUsers.length === 0) {
-      throw new NotFoundError(
-        `No shifts found${userMessage}${dateRangeMessage}`,
-      );
-    }
-
+    // Always return success for collection queries, even if empty
     return Response.json(
       {
         success: true,
@@ -177,7 +112,7 @@ export async function GET(request: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    const apiError = handleAPIError(error);
+    const apiError: APIError = handleAPIError(error);
 
     return Response.json(
       {
@@ -198,7 +133,7 @@ export async function GET(request: NextRequest) {
 // POST /api/shifts - Create new shift
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as unknown;
 
     if (!body || Object.keys(body).length === 0) {
       throw new ValidationError("Request body cannot be empty");
@@ -210,11 +145,22 @@ export async function POST(request: NextRequest) {
     // Insert new shift into the database
     const newShift = await db.insert(shifts).values(shiftData).returning();
 
+    if (!newShift[0]) {
+      throw new Error("Failed to create shift");
+    }
+
+    const shiftWithCoreBlocks = await getShiftWithCoreBlocks([
+      eq(shifts.id, newShift[0].id),
+    ]);
+
+    const formattedShift =
+      formatSingleShiftWithCoreBlocksResponse(shiftWithCoreBlocks);
+
     return Response.json(
       {
         success: true,
         message: "Shift created successfully",
-        shift: newShift[0],
+        shift: formattedShift,
         error: null,
       },
       { status: 201 },
@@ -225,7 +171,7 @@ export async function POST(request: NextRequest) {
     return Response.json(
       {
         success: false,
-        message: "Shift creation failed",
+        message: "Failed to create shift",
         shift: null,
         error: {
           type: apiError.type,

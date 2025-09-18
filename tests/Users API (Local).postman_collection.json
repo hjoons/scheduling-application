@@ -1,11 +1,11 @@
 {
 	"info": {
-		"_postman_id": "9ec3467e-c67f-43aa-9584-51b6c5abc6b3",
+		"_postman_id": "f8dca111-f69b-41b9-a359-577c3a93a797",
 		"name": "Users API (Local)",
 		"description": "CRUD operations for Users with positive and negative test cases",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "47432747",
-		"_collection_link": "https://hjoons-6329250.postman.co/workspace/UTP's-Workspace~7992f774-284a-465c-853d-da3e8b07920d/collection/47432747-9ec3467e-c67f-43aa-9584-51b6c5abc6b3?action=share&source=collection_link&creator=47432747"
+		"_collection_link": "https://hjoons-6329250.postman.co/workspace/UTP's-Workspace~7992f774-284a-465c-853d-da3e8b07920d/collection/47432747-f8dca111-f69b-41b9-a359-577c3a93a797?action=share&source=collection_link&creator=47432747"
 	},
 	"item": [
 		{
@@ -29,22 +29,22 @@
 									"",
 									"pm.test('Response contains user data', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.users).to.have.property('id');",
-									"    pm.expect(jsonData.users.firstName).to.eql('John');",
-									"    pm.expect(jsonData.users.lastName).to.eql('Doe');",
-									"    pm.expect(jsonData.users.email).to.eql('john.doe@example.com');",
+									"    pm.expect(jsonData.user).to.have.property('id');",
+									"    pm.expect(jsonData.user.firstName).to.eql('John');",
+									"    pm.expect(jsonData.user.lastName).to.eql('Doe');",
+									"    pm.expect(jsonData.user.email).to.eql('john.doe@example.com');",
 									"});",
 									"",
 									"pm.test('User has default values', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.users.role).to.eql('unvalidated');",
-									"    pm.expect(jsonData.users.status).to.eql('active');",
+									"    pm.expect(jsonData.user.role).to.eql('unvalidated');",
+									"    pm.expect(jsonData.user.status).to.eql('active');",
 									"});",
 									"",
 									"// Save user ID for other tests",
 									"if (pm.response.code === 201) {",
 									"    const jsonData = pm.response.json();",
-									"    pm.collectionVariables.set('userId', jsonData.users.id);",
+									"    pm.collectionVariables.set('userId', jsonData.user.id);",
 									"}"
 								],
 								"type": "text/javascript",
@@ -90,9 +90,15 @@
 									"",
 									"pm.test('User has specified role and status', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.users.role).to.eql('administrator');",
-									"    pm.expect(jsonData.users.status).to.eql('active');",
-									"});"
+									"    pm.expect(jsonData.user.role).to.eql('administrator');",
+									"    pm.expect(jsonData.user.status).to.eql('active');",
+									"});",
+									"",
+									"// Save user ID for other tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('adminId', jsonData.user.id);",
+									"}"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -615,8 +621,8 @@
 									"",
 									"pm.test('Response contains user data', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.users).to.have.property('id');",
-									"    pm.expect(jsonData.users.id).to.eql(parseInt(pm.collectionVariables.get('userId')));",
+									"    pm.expect(jsonData.user).to.have.property('id');",
+									"    pm.expect(jsonData.user.id).to.eql(parseInt(pm.collectionVariables.get('userId')));",
 									"});"
 								],
 								"type": "text/javascript",
@@ -739,7 +745,7 @@
 									"",
 									"pm.test('User role was updated', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.users.role).to.eql('staff');",
+									"    pm.expect(jsonData.user.role).to.eql('staff');",
 									"});"
 								],
 								"type": "text/javascript",
@@ -786,8 +792,8 @@
 									"",
 									"pm.test('Multiple fields were updated', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.users.firstName).to.eql('Johnny');",
-									"    pm.expect(jsonData.users.status).to.eql('inactive');",
+									"    pm.expect(jsonData.user.firstName).to.eql('Johnny');",
+									"    pm.expect(jsonData.user.status).to.eql('inactive');",
 									"});"
 								],
 								"type": "text/javascript",
@@ -1009,6 +1015,49 @@
 					"response": []
 				},
 				{
+					"name": "21. DELETE - Delete User (Valid ID) Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has success true', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Message indicates deletion', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('deleted successfully');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{adminId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{adminId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "22. DELETE - Delete User (Invalid ID)",
 					"event": [
 						{
@@ -1084,6 +1133,45 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "23. GET - Verify User Deleted Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 404', function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test('User no longer exists', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"    pm.expect(jsonData.error.type).to.eql('NOT_FOUND');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{adminId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{adminId}}"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
@@ -1095,6 +1183,10 @@
 		},
 		{
 			"key": "userId",
+			"value": ""
+		},
+		{
+			"key": "adminId",
 			"value": ""
 		}
 	]

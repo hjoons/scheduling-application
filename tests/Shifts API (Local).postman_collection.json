@@ -1,11 +1,11 @@
 {
 	"info": {
-		"_postman_id": "664bd313-ed36-4b06-9e38-ffe18f47cbd0",
+		"_postman_id": "7220af76-81d9-4193-a98d-c7ba4acdc7da",
 		"name": "Shifts API (Local)",
 		"description": "Comprehensive CRUD operations for Shifts with many-to-many user relationships, complex filtering, and integration test cases",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "47432747",
-		"_collection_link": "https://hjoons-6329250.postman.co/workspace/UTP's-Workspace~7992f774-284a-465c-853d-da3e8b07920d/collection/47432747-664bd313-ed36-4b06-9e38-ffe18f47cbd0?action=share&source=collection_link&creator=47432747"
+		"_collection_link": "https://hjoons-6329250.postman.co/workspace/UTP's-Workspace~7992f774-284a-465c-853d-da3e8b07920d/collection/47432747-7220af76-81d9-4193-a98d-c7ba4acdc7da?action=share&source=collection_link&creator=47432747"
 	},
 	"item": [
 		{
@@ -25,13 +25,13 @@
 									"pm.test('User created successfully', function () {",
 									"    const jsonData = pm.response.json();",
 									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.users).to.have.property('id');",
+									"    pm.expect(jsonData.user).to.have.property('id');",
 									"});",
 									"",
 									"// Save user ID for shift assignment tests",
 									"if (pm.response.code === 201) {",
 									"    const jsonData = pm.response.json();",
-									"    pm.collectionVariables.set('testUserId1', jsonData.users.id);",
+									"    pm.collectionVariables.set('testUserId1', jsonData.user.id);",
 									"}"
 								],
 								"type": "text/javascript",
@@ -78,13 +78,13 @@
 									"pm.test('User created successfully', function () {",
 									"    const jsonData = pm.response.json();",
 									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.users).to.have.property('id');",
+									"    pm.expect(jsonData.user).to.have.property('id');",
 									"});",
 									"",
 									"// Save user ID for shift assignment tests",
 									"if (pm.response.code === 201) {",
 									"    const jsonData = pm.response.json();",
-									"    pm.collectionVariables.set('testUserId2', jsonData.users.id);",
+									"    pm.collectionVariables.set('testUserId2', jsonData.user.id);",
 									"}"
 								],
 								"type": "text/javascript",
@@ -131,13 +131,13 @@
 									"pm.test('User created successfully', function () {",
 									"    const jsonData = pm.response.json();",
 									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.users).to.have.property('id');",
+									"    pm.expect(jsonData.user).to.have.property('id');",
 									"});",
 									"",
 									"// Save user ID for complex filtering tests",
 									"if (pm.response.code === 201) {",
 									"    const jsonData = pm.response.json();",
-									"    pm.collectionVariables.set('testUserId3', jsonData.users.id);",
+									"    pm.collectionVariables.set('testUserId3', jsonData.user.id);",
 									"}"
 								],
 								"type": "text/javascript",
@@ -184,13 +184,13 @@
 									"pm.test('Core block created successfully', function () {",
 									"    const jsonData = pm.response.json();",
 									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.coreBlocks).to.have.property('id');",
+									"    pm.expect(jsonData.coreBlock).to.have.property('id');",
 									"});",
 									"",
 									"// Save core block ID for shift tests",
 									"if (pm.response.code === 201) {",
 									"    const jsonData = pm.response.json();",
-									"    pm.collectionVariables.set('testCoreBlockId1', jsonData.coreBlocks.id);",
+									"    pm.collectionVariables.set('testCoreBlockId1', jsonData.coreBlock.id);",
 									"}"
 								],
 								"type": "text/javascript",
@@ -237,13 +237,13 @@
 									"pm.test('Core block created successfully', function () {",
 									"    const jsonData = pm.response.json();",
 									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.coreBlocks).to.have.property('id');",
+									"    pm.expect(jsonData.coreBlock).to.have.property('id');",
 									"});",
 									"",
 									"// Save second core block ID for filtering tests",
 									"if (pm.response.code === 201) {",
 									"    const jsonData = pm.response.json();",
-									"    pm.collectionVariables.set('testCoreBlockId2', jsonData.coreBlocks.id);",
+									"    pm.collectionVariables.set('testCoreBlockId2', jsonData.coreBlock.id);",
 									"}"
 								],
 								"type": "text/javascript",
@@ -311,7 +311,8 @@
 									"    pm.collectionVariables.set('shiftId1', jsonData.shift.id);",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1208,7 +1209,7 @@
 									"",
 									"pm.test(\"All users are removed\", function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.removedAssignments.length).to.greaterThan(0);",
+									"    pm.expect(jsonData.shift.users.length).to.eql(0);",
 									"});"
 								],
 								"type": "text/javascript",
@@ -1226,7 +1227,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"userIds\": []\n}"
+							"raw": ""
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}/users",
@@ -1517,15 +1518,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}/users",
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"shifts",
-								"{{shiftId1}}",
-								"users"
+								"{{shiftId1}}"
 							]
 						}
 					},
@@ -1770,14 +1770,14 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 404\", function () {",
-									"    pm.response.to.have.status(404);",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"Response contains validation error\", function () {",
+									"pm.test(\"Response contains a no shifts message\", function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.have.property('error');",
-									"    pm.expect(jsonData.error.message).to.include('No shifts found between');",
+									"    pm.expect(jsonData.shifts.length).to.eql(0);",
+									"    pm.expect(jsonData.message).to.include('No shifts found between');",
 									"});"
 								],
 								"type": "text/javascript",

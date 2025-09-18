@@ -73,18 +73,18 @@ This scheduling web application will be used by a small business to generate sch
 
 ### API Routes (Backend)
 
-- [ ] **CRUD Operations**
-  - [ ] Set up Zod schemas for request/response validation
-    - [ ] Request Validation
+- [x] **CRUD Operations**
+  - [x] Set up Zod schemas for request/response validation
+    - [x] Request Validation
       - [x] User validation schemas (create, update, role changes)
       - [x] Core block validation schemas (time blocks, employee requirements)
       - [x] Shift validation schemas (assignments, tips, dates)
       - [x] Availability validation schemas (preferences, exceptions)
-    - [ ] Response Validation
-      - [ ] User validation
-      - [ ] Core block validation
-      - [ ] Shift validation
-      - [ ] Availability validation
+    - [x] Response Validation
+      - [x] User validation
+      - [x] Core block validation
+      - [x] Shift validation
+      - [x] Availability validation
 
   - [x] User Management API Routes
     - [x] `GET /api/users` - List all users with role/status filtering
