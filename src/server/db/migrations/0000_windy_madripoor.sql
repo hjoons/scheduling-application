@@ -1,0 +1,57 @@
+-- CREATE TYPE "public"."UTPS_day_of_week" AS ENUM('mon', 'tues', 'weds', 'thurs', 'fri', 'sat', 'sun');--> statement-breakpoint
+-- CREATE TYPE "public"."UTPS_shift_of_day" AS ENUM('m1', 'm2', 'e1', 'e2');--> statement-breakpoint
+-- CREATE TYPE "public"."UTPS_staff_status" AS ENUM('active', 'inactive', 'on_leave');--> statement-breakpoint
+-- CREATE TYPE "public"."UTPS_user_role" AS ENUM('administrator', 'leadership', 'staff', 'trainee', 'unvalidated');--> statement-breakpoint
+-- CREATE TABLE "UTPS_availabilities" (
+-- 	"id" bigserial PRIMARY KEY NOT NULL,
+-- 	"user_id" bigint NOT NULL,
+-- 	"core_id" bigint NOT NULL,
+-- 	"created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+-- );
+-- --> statement-breakpoint
+-- CREATE TABLE "UTPS_core_blocks" (
+-- 	"id" bigserial PRIMARY KEY NOT NULL,
+-- 	"day_of_week" "UTPS_day_of_week" NOT NULL,
+-- 	"shift_of_day" "UTPS_shift_of_day" NOT NULL,
+-- 	"time_start" bigint NOT NULL,
+-- 	"time_end" bigint NOT NULL,
+-- 	"number_of_employees" bigint NOT NULL,
+-- 	"created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+-- );
+-- --> statement-breakpoint
+-- CREATE TABLE "UTPS_exceptions" (
+-- 	"id" bigserial PRIMARY KEY NOT NULL,
+-- 	"user_id" bigint NOT NULL,
+-- 	"core_id" bigint NOT NULL,
+-- 	"date" date NOT NULL,
+-- 	"description" varchar(512) NOT NULL,
+-- 	"created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+-- );
+-- --> statement-breakpoint
+-- CREATE TABLE "UTPS_users" (
+-- 	"id" bigserial PRIMARY KEY NOT NULL,
+-- 	"first_name" varchar(256) NOT NULL,
+-- 	"last_name" varchar(256) NOT NULL,
+-- 	"role" "UTPS_user_role" DEFAULT 'unvalidated' NOT NULL,
+-- 	"status" "UTPS_staff_status" DEFAULT 'active' NOT NULL,
+-- 	"email" varchar(256) NOT NULL,
+-- 	"created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+-- 	CONSTRAINT "UTPS_users_email_unique" UNIQUE("email")
+-- );
+-- --> statement-breakpoint
+-- CREATE TABLE "UTPS_shifts" (
+-- 	"id" bigserial PRIMARY KEY NOT NULL,
+-- 	"user_id" bigint NOT NULL,
+-- 	"core_id" bigint NOT NULL,
+-- 	"date" date NOT NULL,
+-- 	"tips_earned" real DEFAULT 0 NOT NULL,
+-- 	"created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+-- );
+-- --> statement-breakpoint
+-- ALTER TABLE "UTPS_availabilities" ADD CONSTRAINT "UTPS_availabilities_user_id_UTPS_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."UTPS_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+-- ALTER TABLE "UTPS_availabilities" ADD CONSTRAINT "UTPS_availabilities_core_id_UTPS_core_blocks_id_fk" FOREIGN KEY ("core_id") REFERENCES "public"."UTPS_core_blocks"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+-- ALTER TABLE "UTPS_exceptions" ADD CONSTRAINT "UTPS_exceptions_user_id_UTPS_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."UTPS_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+-- ALTER TABLE "UTPS_exceptions" ADD CONSTRAINT "UTPS_exceptions_core_id_UTPS_core_blocks_id_fk" FOREIGN KEY ("core_id") REFERENCES "public"."UTPS_core_blocks"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+-- ALTER TABLE "UTPS_shifts" ADD CONSTRAINT "UTPS_shifts_user_id_UTPS_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."UTPS_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+-- ALTER TABLE "UTPS_shifts" ADD CONSTRAINT "UTPS_shifts_core_id_UTPS_core_blocks_id_fk" FOREIGN KEY ("core_id") REFERENCES "public"."UTPS_core_blocks"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+-- CREATE UNIQUE INDEX "unique_day_shift_idx" ON "UTPS_core_blocks" USING btree ("day_of_week","shift_of_day");

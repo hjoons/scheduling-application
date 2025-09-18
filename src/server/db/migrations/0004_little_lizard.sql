@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "user_shift_idx" ON "UTPS_user_shifts" USING btree ("user_id","shift_id");

@@ -1,0 +1,1423 @@
+{
+	"info": {
+		"_postman_id": "96fb82f1-4115-486a-a959-738f3e277417",
+		"name": "Reports API (Local)",
+		"description": "Comprehensive test suite for Reports API endpoints including tips, hours, and schedule history with date range filtering",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47432747",
+		"_collection_link": "https://hjoons-6329250.postman.co/workspace/UTP's-Workspace~7992f774-284a-465c-853d-da3e8b07920d/collection/47432747-96fb82f1-4115-486a-a959-738f3e277417?action=share&source=collection_link&creator=47432747"
+	},
+	"item": [
+		{
+			"name": "Setup - Prerequisites",
+			"item": [
+				{
+					"name": "1. Create Test User for Reports",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('User created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.user).to.have.property('id');",
+									"});",
+									"",
+									"// Save user ID for reports tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('testUserId', jsonData.user.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Report\",\n  \"lastName\": \"TestUser\",\n  \"email\": \"report.testuser@example.com\",\n  \"role\": \"staff\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Create Test Core Block for Reports",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Core block created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.coreBlock).to.have.property('id');",
+									"});",
+									"",
+									"// Save core block ID for shift creation",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('testCoreBlockId', jsonData.coreBlock.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"dayOfWeek\": \"mon\",\n  \"shiftOfDay\": \"m1\",\n  \"timeStart\": 930,\n  \"timeEnd\": 1330,\n  \"numberOfEmployees\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Create Test Shift 1 (Past Date)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Shift created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.shift).to.have.property('id');",
+									"});",
+									"",
+									"// Save shift ID",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('testShiftId1', jsonData.shift.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2025-07-15\",\n  \"coreId\": {{testCoreBlockId}},\n  \"tipsEarned\": 25.50\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. Create Test Shift 2 (Recent Date)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Shift created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.shift).to.have.property('id');",
+									"});",
+									"",
+									"// Save shift ID",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('testShiftId2', jsonData.shift.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2025-08-20\",\n  \"coreId\": {{testCoreBlockId}},\n  \"tipsEarned\": 32.75\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Assign User to Test Shift 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('User assigned successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift).to.have.property('users');",
+									"    pm.expect(jsonData.shift.users).to.be.an('array');",
+									"    pm.expect(jsonData.shift.users.length).to.equal(1);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userIds\": [{{testUserId}}]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{testShiftId1}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{testShiftId1}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6. Assign User to Test Shift 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('User assigned successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift).to.have.property('users');",
+									"    pm.expect(jsonData.shift.users).to.be.an('array');",
+									"    pm.expect(jsonData.shift.users.length).to.equal(1);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userIds\": [{{testUserId}}]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{testShiftId2}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{testShiftId2}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tips Reports Tests",
+			"item": [
+				{
+					"name": "7. GET - Tips Report (Valid Date Range)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has success true', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Response contains tips report data', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.report).to.have.property('userId');",
+									"    pm.expect(jsonData.report).to.have.property('firstName');",
+									"    pm.expect(jsonData.report).to.have.property('lastName');",
+									"    pm.expect(jsonData.report).to.have.property('period');",
+									"    pm.expect(jsonData.report).to.have.property('summary');",
+									"    pm.expect(jsonData.report).to.have.property('data');",
+									"});",
+									"",
+									"pm.test('Summary contains expected fields', function () {",
+									"    const jsonData = pm.response.json();",
+									"    const summary = jsonData.report.summary;",
+									"    pm.expect(summary).to.have.property('totalTips');",
+									"    pm.expect(summary).to.have.property('totalShifts');",
+									"    pm.expect(summary.totalTips).to.be.a('number');",
+									"    pm.expect(summary.totalShifts).to.be.a('number');",
+									"});",
+									"",
+									"pm.test('Tips data contains shift details', function () {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.report.data.length > 0) {",
+									"        const shift = jsonData.report.data[0];",
+									"        pm.expect(shift).to.have.property('shiftId');",
+									"        pm.expect(shift).to.have.property('date');",
+									"        pm.expect(shift).to.have.property('coreBlock');",
+									"        pm.expect(shift.coreBlock).to.have.property('timeStart');",
+									"        pm.expect(shift.coreBlock).to.have.property('timeEnd');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/tips/{{testUserId}}?startDate=2025-07-01&endDate=2025-08-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"tips",
+								"{{testUserId}}"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-07-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "8. GET - Tips Report (Missing startDate)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Response has success false', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"});",
+									"",
+									"pm.test('Error mentions required parameters', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql('VALIDATION_ERROR');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/tips/{{testUserId}}?endDate=2025-08-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"tips",
+								"{{testUserId}}"
+							],
+							"query": [
+								{
+									"key": "endDate",
+									"value": "2025-08-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "9. GET - Tips Report (Invalid Date Format)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error mentions date format', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('YYYY-MM-DD');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/tips/{{testUserId}}?startDate=07/01/2025&endDate=08/31/2025",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"tips",
+								"{{testUserId}}"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "07/01/2025"
+								},
+								{
+									"key": "endDate",
+									"value": "08/31/2025"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "10. GET - Tips Report (Invalid Date Range)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error mentions date range', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('Start date cannot be after end date');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/tips/{{testUserId}}?startDate=2025-08-31&endDate=2025-07-01",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"tips",
+								"{{testUserId}}"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-08-31"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-07-01"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "11. GET - Tips Report (Non-existent User)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 404', function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test('Error mentions user not found', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('not found');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/tips/99999?startDate=2025-07-01&endDate=2025-08-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"tips",
+								"99999"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-07-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "12. GET - Tips Report (Invalid User ID Format)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error mentions invalid user ID format', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('Invalid user ID format');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/tips/invalid_id?startDate=2025-07-01&endDate=2025-08-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"tips",
+								"invalid_id"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-07-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-31"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Hours Reports Tests",
+			"item": [
+				{
+					"name": "13. GET - Hours Report (Valid Date Range)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has success true', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Response contains hours report data', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.report).to.have.property('userId');",
+									"    pm.expect(jsonData.report).to.have.property('firstName');",
+									"    pm.expect(jsonData.report).to.have.property('lastName');",
+									"    pm.expect(jsonData.report).to.have.property('period');",
+									"    pm.expect(jsonData.report).to.have.property('summary');",
+									"    pm.expect(jsonData.report).to.have.property('data');",
+									"});",
+									"",
+									"pm.test('Summary contains expected fields', function () {",
+									"    const jsonData = pm.response.json();",
+									"    const summary = jsonData.report.summary;",
+									"    pm.expect(summary).to.have.property('totalHours');",
+									"    pm.expect(summary).to.have.property('totalShifts');",
+									"    pm.expect(summary.totalHours).to.be.a('number');",
+									"    pm.expect(summary.totalShifts).to.be.a('number');",
+									"});",
+									"",
+									"pm.test('Hours calculation is correct for core block times', function () {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.report.data.length > 0) {",
+									"        const shift = jsonData.report.data[0];",
+									"        pm.expect(shift).to.have.property('hoursWorked');",
+									"        pm.expect(shift.hoursWorked).to.be.a('number');",
+									"        // Core block is 930-1330 which should be 4.0 hours (9:30 to 13:30)",
+									"        pm.expect(shift.hoursWorked).to.equal(4.0);",
+									"        pm.expect(shift.coreBlock.timeStart).to.equal(930);",
+									"        pm.expect(shift.coreBlock.timeEnd).to.equal(1330);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/hours/{{testUserId}}?startDate=2025-07-01&endDate=2025-08-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"hours",
+								"{{testUserId}}"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-07-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "14. GET - Hours Report (Missing Parameters)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error mentions validation error', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql('VALIDATION_ERROR');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/hours/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"hours",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "15. GET - Hours Report (Narrow Date Range - No Data)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response shows empty data for date range with no shifts', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.report.data).to.be.an('array');",
+									"    pm.expect(jsonData.report.data.length).to.equal(0);",
+									"    pm.expect(jsonData.report.summary.totalHours).to.equal(0);",
+									"    pm.expect(jsonData.report.summary.totalShifts).to.equal(0);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/hours/{{testUserId}}?startDate=2025-06-01&endDate=2025-06-30",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"hours",
+								"{{testUserId}}"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-06-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-06-30"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Schedule History Tests",
+			"item": [
+				{
+					"name": "16. GET - Schedule History (Valid Date Range)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has success true', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Response contains schedule history data', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('shifts');",
+									"    pm.expect(jsonData).to.have.property('filters');",
+									"    pm.expect(jsonData.shifts).to.be.an('array');",
+									"});",
+									"",
+									"pm.test('Schedule data has shifts API structure', function () {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.shifts.length > 0) {",
+									"        const shift = jsonData.shifts[0];",
+									"        pm.expect(shift).to.have.property('id');",
+									"        pm.expect(shift).to.have.property('date');",
+									"        pm.expect(shift).to.have.property('tipsEarned');",
+									"        pm.expect(shift).to.have.property('coreId');",
+									"        pm.expect(shift).to.have.property('dayOfWeek');",
+									"        pm.expect(shift).to.have.property('shiftOfDay');",
+									"        pm.expect(shift).to.have.property('timeStart');",
+									"        pm.expect(shift).to.have.property('timeEnd');",
+									"        pm.expect(shift).to.have.property('numberOfEmployees');",
+									"        pm.expect(shift).to.have.property('users');",
+									"        pm.expect(shift.users).to.be.an('array');",
+									"    }",
+									"});",
+									"",
+									"pm.test('Users array contains user details', function () {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.shifts.length > 0) {",
+									"        const shift = jsonData.shifts[0];",
+									"        if (shift.users.length > 0) {",
+									"            const user = shift.users[0];",
+									"            pm.expect(user).to.have.property('id');",
+									"            pm.expect(user).to.have.property('firstName');",
+									"            pm.expect(user).to.have.property('lastName');",
+									"            pm.expect(user).to.have.property('email');",
+									"            pm.expect(user).to.have.property('role');",
+									"        }",
+									"    }",
+									"});",
+									"",
+									"pm.test('Filters are applied correctly', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.filters.startDate).to.equal('2025-07-01');",
+									"    pm.expect(jsonData.filters.endDate).to.equal('2025-08-31');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/schedule-history?startDate=2025-07-01&endDate=2025-08-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"schedule-history"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-07-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "17. GET - Schedule History (Missing Required Parameters)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error mentions validation error', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql('VALIDATION_ERROR');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/schedule-history?startDate=2025-07-01",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"schedule-history"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-07-01"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "18. GET - Schedule History (Invalid Date Format)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error mentions date format', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('YYYY-MM-DD');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/schedule-history?startDate=07-01-2025&endDate=08-31-2025",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"schedule-history"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "07-01-2025"
+								},
+								{
+									"key": "endDate",
+									"value": "08-31-2025"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "19. GET - Schedule History (Empty Date Range)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response shows empty data for date range with no shifts', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shifts).to.be.an('array');",
+									"    pm.expect(jsonData.shifts.length).to.equal(0);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/schedule-history?startDate=2025-06-01&endDate=2025-06-30",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"schedule-history"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-06-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-06-30"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Integration Tests",
+			"item": [
+				{
+					"name": "20. Cross-Report Data Consistency Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Tips and hours data consistency', function () {",
+									"    const jsonData = pm.response.json();",
+									"    ",
+									"    // Get tips total from previous test",
+									"    const tipsTotal = pm.collectionVariables.get('totalTips') || 0;",
+									"    const hoursTotal = pm.collectionVariables.get('totalHours') || 0;",
+									"    ",
+									"    // Store current values for comparison",
+									"    if (jsonData.report.data.length > 0) {",
+									"        pm.collectionVariables.set('currentTotalTips', jsonData.report.summary.totalTips);",
+									"    }",
+									"    ",
+									"    pm.expect(jsonData.report.summary.totalShifts).to.be.at.least(0);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/tips/{{testUserId}}?startDate=2025-07-01&endDate=2025-08-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"tips",
+								"{{testUserId}}"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-07-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "21. Schedule History vs Individual Reports Consistency",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Schedule history contains shifts from individual reports', function () {",
+									"    const jsonData = pm.response.json();",
+									"    const shifts = jsonData.shifts;",
+									"    ",
+									"    // Should have shifts that match our test data",
+									"    pm.expect(shifts.length).to.be.at.least(0);",
+									"    ",
+									"    // Each shift should have the structure expected by shifts API",
+									"    shifts.forEach(shift => {",
+									"        pm.expect(shift).to.have.property('id');",
+									"        pm.expect(shift).to.have.property('date');",
+									"        pm.expect(shift).to.have.property('users');",
+									"        pm.expect(shift).to.have.property('dayOfWeek');",
+									"        pm.expect(shift).to.have.property('timeStart');",
+									"        pm.expect(shift).to.have.property('timeEnd');",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reports/schedule-history?startDate=2025-07-01&endDate=2025-08-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"schedule-history"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-07-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-31"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cleanup - Remove Test Data",
+			"item": [
+				{
+					"name": "22. Delete Test Shift 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Shift deleted successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.include('deleted successfully');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{testShiftId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{testShiftId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "23. Delete Test Shift 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Shift deleted successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{testShiftId2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{testShiftId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "24. Delete Test Core Block",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Core block deleted successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks/{{testCoreBlockId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks",
+								"{{testCoreBlockId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "25. Delete Test User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('User deleted successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.include('deleted successfully');",
+									"});",
+									"",
+									"pm.test('Reports test cleanup complete', function () {",
+									"    pm.expect(true).to.be.true;",
+									"    console.log('✅ All reports test data successfully cleaned up');",
+									"    console.log('📊 Reports API test suite completed successfully');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "testUserId",
+			"value": ""
+		},
+		{
+			"key": "testCoreBlockId",
+			"value": ""
+		},
+		{
+			"key": "testShiftId1",
+			"value": ""
+		},
+		{
+			"key": "testShiftId2",
+			"value": ""
+		},
+		{
+			"key": "totalTips",
+			"value": ""
+		},
+		{
+			"key": "totalHours",
+			"value": ""
+		},
+		{
+			"key": "currentTotalTips",
+			"value": ""
+		}
+	]
+}

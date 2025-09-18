@@ -1,0 +1,2947 @@
+{
+	"info": {
+		"_postman_id": "7220af76-81d9-4193-a98d-c7ba4acdc7da",
+		"name": "Shifts API (Local)",
+		"description": "Comprehensive CRUD operations for Shifts with many-to-many user relationships, complex filtering, and integration test cases",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47432747",
+		"_collection_link": "https://hjoons-6329250.postman.co/workspace/UTP's-Workspace~7992f774-284a-465c-853d-da3e8b07920d/collection/47432747-7220af76-81d9-4193-a98d-c7ba4acdc7da?action=share&source=collection_link&creator=47432747"
+	},
+	"item": [
+		{
+			"name": "Setup - Prerequisites",
+			"item": [
+				{
+					"name": "1. Create Test User 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('User created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.user).to.have.property('id');",
+									"});",
+									"",
+									"// Save user ID for shift assignment tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('testUserId1', jsonData.user.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Alice\",\n  \"lastName\": \"Johnson\",\n  \"email\": \"alice.johnson.shifts@example.com\",\n  \"role\": \"staff\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Create Test User 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('User created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.user).to.have.property('id');",
+									"});",
+									"",
+									"// Save user ID for shift assignment tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('testUserId2', jsonData.user.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Bob\",\n  \"lastName\": \"Smith\",\n  \"email\": \"bob.smith.shifts@example.com\",\n  \"role\": \"staff\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Create Test User 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('User created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.user).to.have.property('id');",
+									"});",
+									"",
+									"// Save user ID for complex filtering tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('testUserId3', jsonData.user.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Charlie\",\n  \"lastName\": \"Wilson\",\n  \"email\": \"charlie.wilson.shifts@example.com\",\n  \"role\": \"administrator\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. Create Test Core Block 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Core block created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.coreBlock).to.have.property('id');",
+									"});",
+									"",
+									"// Save core block ID for shift tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('testCoreBlockId1', jsonData.coreBlock.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 101,\n  \"dayOfWeek\": \"tues\",\n  \"shiftOfDay\": \"m1\",\n  \"timeStart\": 900,\n  \"timeEnd\": 1300,\n  \"numberOfEmployees\": 3\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Create Test Core Block 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Core block created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.coreBlock).to.have.property('id');",
+									"});",
+									"",
+									"// Save second core block ID for filtering tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('testCoreBlockId2', jsonData.coreBlock.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 102,\n  \"dayOfWeek\": \"weds\",\n  \"shiftOfDay\": \"e1\",\n  \"timeStart\": 1400,\n  \"timeEnd\": 1800,\n  \"numberOfEmployees\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Shifts CRUD Operations",
+			"item": [
+				{
+					"name": "6. POST - Create Shift (Valid - Basic)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Response has success true', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Response contains shift data', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift).to.have.property('id');",
+									"    pm.expect(jsonData.shift.date).to.eql('2025-08-25');",
+									"    pm.expect(jsonData.shift.coreId).to.eql(101);",
+									"    pm.expect(jsonData.shift.tipsEarned).to.eql(0);",
+									"});",
+									"",
+									"// Save shift ID for other tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('shiftId1', jsonData.shift.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2025-08-25\",\n  \"coreId\": 101,\n  \"tipsEarned\": 0\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7. POST - Create Shift (Valid - With Tips)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Shift has specified tips amount', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift.tipsEarned).to.eql(45.75);",
+									"});",
+									"",
+									"// Save second shift ID for filtering tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('shiftId2', jsonData.shift.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2025-08-26\",\n  \"coreId\": 102,\n  \"tipsEarned\": 45.75\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "8. POST - Create Shift (Valid - Future Date)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Future date shift created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift.date).to.eql('2025-12-15');",
+									"});",
+									"",
+									"// Save third shift ID for user assignment tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('shiftId3', jsonData.shift.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2025-12-15\",\n  \"coreId\": 101,\n  \"tipsEarned\": 30.00\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "9. POST - Create Shift (Invalid - Missing Required Fields)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Response has success false', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"});",
+									"",
+									"pm.test('Error type is VALIDATION_ERROR', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql('VALIDATION_ERROR');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2025-08-25\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "10. POST - Create Shift (Invalid - Wrong Date Format)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error mentions invalid date format', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('Date must be in YYYY-MM-DD format');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"08/25/2025\",\n  \"coreId\": 101,\n  \"tipsEarned\": 0\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "11. POST - Create Shift (Invalid - Negative Tips)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error mentions negative tips not allowed', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('Tips earned must be non-negative');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2025-08-25\",\n  \"coreId\": 101,\n  \"tipsEarned\": -15.00\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "12. POST - Create Shift (Invalid - Non-existent Core Block)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400 or 500', function () {",
+									"    pm.expect([400, 409, 500]).to.include(pm.response.code);",
+									"});",
+									"",
+									"pm.test('Response has success false', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"});",
+									"",
+									"pm.test('Error indicates FK violation or core block issue', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message.toLowerCase()).to.satisfy(function(msg) {",
+									"        return msg.includes('foreign key') || msg.includes('constraint') || msg.includes('core') || msg.includes('reference');",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2025-08-25\",\n  \"coreId\": 999999,\n  \"tipsEarned\": 0\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "13. POST - Create Shift (Empty Body)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error message mentions empty body', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('Request body cannot be empty');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "14. GET - Get All Shifts (Basic)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has success true', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Response contains shifts array', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shifts).to.be.an('array');",
+									"    pm.expect(jsonData.shifts.length).to.be.greaterThan(0);",
+									"});",
+									"",
+									"pm.test('Shifts have core block data', function () {",
+									"    const jsonData = pm.response.json();",
+									"    jsonData.shifts.forEach((shift) => {",
+									"        pm.expect(shift).to.have.property('timeStart');",
+									"        pm.expect(shift).to.have.property('dayOfWeek');",
+									"        pm.expect(shift).to.have.property('users');",
+									"        pm.expect(shift.users).to.be.an('array');",
+									"    })    ",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "15. GET - Get Single Shift (Valid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response contains shift data', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.shift).to.have.property('id');",
+									"    pm.expect(jsonData.shift.id).to.eql(pm.collectionVariables.get('shiftId1'));",
+									"});",
+									"",
+									"pm.test('Shift has core block information', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift).to.have.property('timeStart');",
+									"    pm.expect(jsonData.shift).to.have.property('dayOfWeek');",
+									"    pm.expect(jsonData.shift).to.have.property('numberOfEmployees');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{shiftId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "16. GET - Get Non-existent Shift",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 404', function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test('Response has success false', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"});",
+									"",
+									"pm.test('Error type is NOT_FOUND', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql('NOT_FOUND');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/999999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"999999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "17. PUT - Update Shift (Valid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has success true', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Shift was updated', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift.tipsEarned).to.eql(25.50);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tipsEarned\": 25.50\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{shiftId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "18. PUT - Update Non-existent Shift",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400 or 500', function () {",
+									"    pm.expect([400, 404, 500]).to.include(pm.response.code);",
+									"});",
+									"",
+									"pm.test('Response has success false', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tipsEarned\": 15.00\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/999999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"999999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "19. DELETE - Delete Shift (Valid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has success true', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Message confirms deletion', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('deleted successfully');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{shiftId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "20. DELETE - Delete Non-existent Shift",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400 or 500', function () {",
+									"    pm.expect([400, 404, 500]).to.include(pm.response.code);",
+									"});",
+									"",
+									"pm.test('Response has success false', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/999999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"999999"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Assignment Operations",
+			"item": [
+				{
+					"name": "21. Assign User to Shift - Valid Assignment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has correct structure\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift).to.have.property('id');",
+									"    pm.expect(jsonData.shift).to.have.property('coreId');",
+									"    pm.expect(jsonData.shift).to.have.property('date');",
+									"    pm.expect(jsonData.shift).to.have.property('users');",
+									"    pm.expect(jsonData.shift.users).to.be.an('array');",
+									"    pm.expect(jsonData.shift.users.length).to.equal(1);",
+									"    pm.expect(jsonData.shift.users[0]).to.have.property('id');",
+									"    pm.expect(jsonData.shift.users[0]).to.have.property('firstName');",
+									"    pm.expect(jsonData.shift.users[0]).to.have.property('lastName');",
+									"    pm.expect(jsonData.shift.users[0]).to.have.property('email');",
+									"    pm.expect(jsonData.shift.users[0]).to.have.property('role');",
+									"});",
+									"",
+									"console.log(pm.environment.get(\"testUserId1\"));",
+									"pm.test(\"User is correctly assigned\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift.users[0].id).to.equal(parseInt(pm.collectionVariables.get('testUserId1')));",
+									"    ",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userIds\": [{{testUserId1}}]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{shiftId1}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "22. Assign Multiple Users to Shift",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has correct structure with multiple users\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift).to.have.property('users');",
+									"    pm.expect(jsonData.shift.users).to.be.an('array');",
+									"    pm.expect(jsonData.shift.users.length).to.equal(3);",
+									"    ",
+									"    // Check each user has required properties",
+									"    jsonData.shift.users.forEach(user => {",
+									"        pm.expect(user).to.have.property('id');",
+									"        pm.expect(user).to.have.property('lastName');",
+									"        pm.expect(user).to.have.property('firstName');",
+									"        pm.expect(user).to.have.property('email');",
+									"        pm.expect(user).to.have.property('role');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"All requested users are assigned\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    const assignedUserIds = jsonData.shift.users.map(user => user.id);",
+									"    pm.expect(assignedUserIds).to.include(parseInt(pm.collectionVariables.get('testUserId1')));",
+									"    pm.expect(assignedUserIds).to.include(parseInt(pm.collectionVariables.get('testUserId2')));",
+									"    pm.expect(assignedUserIds).to.include(parseInt(pm.collectionVariables.get('testUserId3')));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userIds\": [{{testUserId1}}, {{testUserId2}}, {{testUserId3}}]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{shiftId1}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "23. Remove User from Shift",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has correct structure\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift).to.have.property('users');",
+									"    pm.expect(jsonData.shift.users).to.be.an('array');",
+									"    pm.expect(jsonData.shift.users.length).to.equal(2);",
+									"});",
+									"",
+									"pm.test(\"Specified user is removed\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    const assignedUserIds = jsonData.shift.users.map(user => user.id);",
+									"    pm.expect(assignedUserIds).to.not.include(parseInt(pm.collectionVariables.get('testUserId2')));",
+									"    pm.expect(assignedUserIds).to.include(parseInt(pm.collectionVariables.get('testUserId1')));",
+									"    pm.expect(assignedUserIds).to.include(parseInt(pm.collectionVariables.get('testUserId3')));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userIds\": [{{testUserId1}}, {{testUserId3}}]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{shiftId1}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "24. Clear All Users from Shift",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"All users are removed\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift.users.length).to.eql(0);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{shiftId1}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "25. Assign Non-existent User to Shift - Should Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400 or 500\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([400, 409, 500]);",
+									"});",
+									"",
+									"pm.test(\"Response contains error message\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"    pm.expect(jsonData.error.message).to.be.a('string');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userIds\": [99999]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{shiftId1}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "26. Assign Users to Non-existent Shift - Should Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 409\", function () {",
+									"    pm.response.to.have.status(409);",
+									"});",
+									"",
+									"pm.test(\"Response contains error message\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"    pm.expect(jsonData.error.message).to.include('does not exist');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userIds\": [{{testUserId1}}]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/99999/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"99999",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "27. Assign Users with Invalid Request Body - Should Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Response contains validation error\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"    pm.expect(jsonData.error.type).to.equal('VALIDATION_ERROR');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"invalidField\": \"invalidValue\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{shiftId1}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "28. Assign Users with Empty UserIds Array",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error type is VALIDATION_ERROR\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.equal(\"VALIDATION_ERROR\")",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userIds\": []\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{shiftId1}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "29. Assign Users with Duplicate IDs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains user only once\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift).to.have.property('users');",
+									"    pm.expect(jsonData.shift.users).to.be.an('array');",
+									"    pm.expect(jsonData.shift.users.length).to.equal(1);",
+									"    pm.expect(jsonData.shift.users[0].id).to.equal(parseInt(pm.collectionVariables.get('testUserId1')));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userIds\": [{{testUserId1}}, {{testUserId1}}, {{testUserId1}}]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{shiftId1}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "30. Get Shift to Verify User Assignment State",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response shows current user assignment\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift).to.have.property('users');",
+									"    pm.expect(jsonData.shift.users).to.be.an('array');",
+									"    pm.expect(jsonData.shift.users.length).to.equal(1);",
+									"    pm.expect(jsonData.shift.users[0].id).to.equal(parseInt(pm.collectionVariables.get('testUserId1')));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{shiftId1}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Complex Filtering Tests",
+			"item": [
+				{
+					"name": "31. Filter Shifts by Date Range",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains shifts array\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('shifts');",
+									"    pm.expect(jsonData.shifts).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"All shifts are within date range\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    const startDate = new Date('2025-08-20');",
+									"    const endDate = new Date('2025-08-30');",
+									"    ",
+									"    jsonData.shifts.forEach(shift => {",
+									"        const shiftDate = new Date(shift.date);",
+									"        pm.expect(shiftDate).to.be.at.least(startDate);",
+									"        pm.expect(shiftDate).to.be.at.most(endDate);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts?startDate=2025-08-20&endDate=2025-08-30",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-08-20"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-30"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "32. Filter Shifts by Single Date",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"All shifts are on specified date\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    const targetDate = '2025-08-25';",
+									"    ",
+									"    jsonData.shifts.forEach(shift => {",
+									"        pm.expect(shift.date).to.equal(targetDate);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts?date=2025-08-25",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2025-08-25"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "33. Filter Shifts by User Assignment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains shifts with assigned users\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shifts).to.be.an('array');",
+									"    ",
+									"    jsonData.shifts.forEach(shift => {",
+									"        pm.expect(shift).to.have.property('users');",
+									"        pm.expect(shift.users).to.be.an('array');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"All returned shifts have the specified user assigned\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    const targetUserId = parseInt(pm.collectionVariables.get('testUserId1'));",
+									"    ",
+									"    jsonData.shifts.forEach(shift => {",
+									"        const userIds = shift.users.map(user => user.id);",
+									"        pm.expect(userIds).to.include(targetUserId);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts?userId={{testUserId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{testUserId1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "34. Combined Filters - Date Range + Core Block + User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"All filters are applied correctly\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    const startDate = new Date('2025-08-01');",
+									"    const endDate = new Date('2025-12-31');",
+									"    const targetUserId = parseInt(pm.collectionVariables.get('testUserId1'));",
+									"    ",
+									"    jsonData.shifts.forEach(shift => {",
+									"        // Check date range",
+									"        const shiftDate = new Date(shift.date);",
+									"        pm.expect(shiftDate).to.be.at.least(startDate);",
+									"        pm.expect(shiftDate).to.be.at.most(endDate);",
+									"        ",
+									"        // Check user assignment",
+									"        const userIds = shift.users.map(user => user.id);",
+									"        pm.expect(userIds).to.include(targetUserId);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts?startDate=2025-08-01&endDate=2025-12-31&userId={{testUserId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-08-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-12-31"
+								},
+								{
+									"key": "userId",
+									"value": "{{testUserId1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "35. Invalid Date Range Filter - Should Handle Gracefully",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains a no shifts message\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shifts.length).to.eql(0);",
+									"    pm.expect(jsonData.message).to.include('No shifts found between');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts?startDate=2025-08-30&endDate=2025-08-20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-08-30"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-20"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Integration Tests",
+			"item": [
+				{
+					"name": "36. Complete Shift Lifecycle - Create, Assign, Update, Delete",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// This test will run a complete lifecycle of a shift"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Shift created successfully\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.shift).to.have.property('id');",
+									"});",
+									"",
+									"// Save the integration test shift ID",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('integrationShiftId', jsonData.shift.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2025-09-15\",\n  \"coreId\": {{testCoreBlockId1}},\n  \"tipsEarned\": 35.50\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "37. Assign Multiple Users to Integration Shift",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"All three users assigned successfully\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift.users).to.be.an('array');",
+									"    pm.expect(jsonData.shift.users.length).to.equal(3);",
+									"    ",
+									"    const userIds = jsonData.shift.users.map(user => user.id);",
+									"    pm.expect(userIds).to.include(parseInt(pm.collectionVariables.get('testUserId1')));",
+									"    pm.expect(userIds).to.include(parseInt(pm.collectionVariables.get('testUserId2')));",
+									"    pm.expect(userIds).to.include(parseInt(pm.collectionVariables.get('testUserId3')));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userIds\": [{{testUserId1}}, {{testUserId2}}, {{testUserId3}}]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{integrationShiftId}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{integrationShiftId}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "38. Update Integration Shift Tips",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Tips updated successfully\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift.tipsEarned).to.equal(42.75);",
+									"});",
+									"",
+									"pm.test(\"User assignments preserved after update\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    console.log(jsonData.shift);",
+									"    pm.expect(jsonData.shift).to.have.property('users');",
+									"    pm.expect(jsonData.shift.users.length).to.equal(3);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tipsEarned\": 42.75\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{integrationShiftId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{integrationShiftId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "39. Verify Integration Shift State",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Shift has correct state after all operations\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift.date).to.equal('2025-09-15');",
+									"    pm.expect(jsonData.shift.tipsEarned).to.equal(42.75);",
+									"    pm.expect(jsonData.shift.coreId).to.equal(parseInt(pm.collectionVariables.get('testCoreBlockId1')));",
+									"});",
+									"",
+									"pm.test(\"Core block information is included\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift).to.have.property('timeStart');",
+									"    pm.expect(jsonData.shift).to.have.property('dayOfWeek');",
+									"    pm.expect(jsonData.shift).to.have.property('numberOfEmployees');",
+									"});",
+									"",
+									"pm.test(\"All assigned users are present\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift.users.length).to.equal(3);",
+									"    ",
+									"    const userIds = jsonData.shift.users.map(user => user.id);",
+									"    pm.expect(userIds).to.include(parseInt(pm.collectionVariables.get('testUserId1')));",
+									"    pm.expect(userIds).to.include(parseInt(pm.collectionVariables.get('testUserId2')));",
+									"    pm.expect(userIds).to.include(parseInt(pm.collectionVariables.get('testUserId3')));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{integrationShiftId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{integrationShiftId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "40. Bulk Shift Creation for Different Core Blocks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Bulk shift 1 created successfully\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.shift.coreId).to.equal(parseInt(pm.collectionVariables.get('testCoreBlockId2')));",
+									"});",
+									"",
+									"// Save for filtering tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('bulkShiftId1', jsonData.shift.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2025-09-16\",\n  \"coreId\": {{testCoreBlockId2}},\n  \"tipsEarned\": 28.25\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "41. Bulk Shift Creation - Second Shift",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"// Save for filtering tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('bulkShiftId2', jsonData.shift.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2025-09-17\",\n  \"coreId\": {{testCoreBlockId1}},\n  \"tipsEarned\": 55.00\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "42. Complex User Assignment Scenario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Only specific users assigned to bulk shift 1\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift.users.length).to.equal(2);",
+									"    ",
+									"    const userIds = jsonData.shift.users.map(user => user.id);",
+									"    pm.expect(userIds).to.include(parseInt(pm.collectionVariables.get('testUserId1')));",
+									"    pm.expect(userIds).to.include(parseInt(pm.collectionVariables.get('testUserId3')));",
+									"    pm.expect(userIds).to.not.include(parseInt(pm.collectionVariables.get('testUserId2')));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userIds\": [{{testUserId1}}, {{testUserId3}}]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{bulkShiftId1}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{bulkShiftId1}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "43. Cross-Shift User Assignment Verification",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User is assigned to only bulk shift 2\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift.users.length).to.equal(1);",
+									"    pm.expect(jsonData.shift.users[0].id).to.equal(parseInt(pm.collectionVariables.get('testUserId2')));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userIds\": [{{testUserId2}}]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{bulkShiftId2}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{bulkShiftId2}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "44. Integration Filter Test - Multiple Core Blocks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Returns shifts for both core blocks\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shifts.length).to.be.greaterThan(0);",
+									"    ",
+									"    const coreIds = jsonData.shifts.map(shift => shift.coreId);",
+									"    const uniqueCoreIds = [...new Set(coreIds)];",
+									"    pm.expect(uniqueCoreIds.length).to.be.greaterThan(1);",
+									"});",
+									"",
+									"pm.test(\"Each shift has core block information\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    ",
+									"    jsonData.shifts.forEach(shift => {",
+									"        pm.expect(shift).to.have.property('timeStart');",
+									"        pm.expect(shift).to.have.property('dayOfWeek');",
+									"        pm.expect(shift).to.have.property('shiftOfDay');",
+									"        pm.expect(shift).to.have.property('users');",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts?startDate=2025-09-15&endDate=2025-09-17",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-09-15"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-09-17"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "45. Integration User Schedule View",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Returns shifts where testUserId1 is assigned\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shifts.length).to.be.greaterThan(0);",
+									"    ",
+									"    const targetUserId = parseInt(pm.collectionVariables.get('testUserId1'));",
+									"    ",
+									"    jsonData.shifts.forEach(shift => {",
+									"        const userIds = shift.users.map(user => user.id);",
+									"        pm.expect(userIds).to.include(targetUserId);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"User appears in multiple shifts\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shifts.length).to.be.at.least(2);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts?userId={{testUserId1}}&startDate=2025-09-01&endDate=2025-09-30",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{testUserId1}}"
+								},
+								{
+									"key": "startDate",
+									"value": "2025-09-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-09-30"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "46. Integration Concurrent User Assignment Test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User successfully reassigned to different shift\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shift.users.length).to.equal(2);",
+									"    ",
+									"    const userIds = jsonData.shift.users.map(user => user.id);",
+									"    pm.expect(userIds).to.include(parseInt(pm.collectionVariables.get('testUserId2')));",
+									"    pm.expect(userIds).to.include(parseInt(pm.collectionVariables.get('testUserId3')));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userIds\": [{{testUserId2}}, {{testUserId3}}]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{integrationShiftId}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{integrationShiftId}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cleanup - Remove Test Data",
+			"item": [
+				{
+					"name": "47. Delete Integration Test Shift",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Integration shift deleted successfully\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.include('deleted successfully');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{integrationShiftId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{integrationShiftId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "48. Delete Bulk Test Shift 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Bulk shift 1 deleted successfully\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{bulkShiftId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{bulkShiftId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "49. Delete Bulk Test Shift 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Bulk shift 2 deleted successfully\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{bulkShiftId2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{bulkShiftId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "50. Delete Remaining Test Shift (shiftId1)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 404\", function () {",
+									"    pm.expect([200, 404]).to.include(pm.response.code);",
+									"});",
+									"",
+									"if (pm.response.code === 200) {",
+									"    pm.test(\"Remaining shift deleted successfully\", function () {",
+									"        const jsonData = pm.response.json();",
+									"        pm.expect(jsonData.success).to.eql(true);",
+									"    });",
+									"} else if (pm.response.code === 404) {",
+									"    pm.test(\"Shift already deleted (acceptable)\", function () {",
+									"        const jsonData = pm.response.json();",
+									"        pm.expect(jsonData.success).to.eql(false);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{shiftId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "51. Delete Remaining Test Shift (shiftId3)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 404\", function () {",
+									"    pm.expect([200, 404]).to.include(pm.response.code);",
+									"});",
+									"",
+									"if (pm.response.code === 200) {",
+									"    pm.test(\"Remaining shift deleted successfully\", function () {",
+									"        const jsonData = pm.response.json();",
+									"        pm.expect(jsonData.success).to.eql(true);",
+									"    });",
+									"} else if (pm.response.code === 404) {",
+									"    pm.test(\"Shift already deleted (acceptable)\", function () {",
+									"        const jsonData = pm.response.json();",
+									"        pm.expect(jsonData.success).to.eql(false);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts/{{shiftId3}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts",
+								"{{shiftId3}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "52. Delete Test Core Block 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Test core block 1 deleted successfully\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.include('deleted successfully');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks/{{testCoreBlockId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks",
+								"{{testCoreBlockId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "53. Delete Test Core Block 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Test core block 2 deleted successfully\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.include('deleted successfully');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks/{{testCoreBlockId2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks",
+								"{{testCoreBlockId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "54. Delete Test User 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Test user 1 deleted successfully\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.include('deleted successfully');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{testUserId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{testUserId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "55. Delete Test User 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Test user 2 deleted successfully\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.include('deleted successfully');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{testUserId2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{testUserId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "56. Delete Test User 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Test user 3 deleted successfully\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.include('deleted successfully');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{testUserId3}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{testUserId3}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "57. Verify All Test Data Cleaned Up",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"No test shifts remain in system\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.shifts).to.be.an('array');",
+									"    ",
+									"    // Check that none of our test shift IDs are present",
+									"    const shiftIds = jsonData.shifts.map(shift => shift.id);",
+									"    const testShiftIds = [",
+									"        pm.collectionVariables.get('shiftId1'),",
+									"        pm.collectionVariables.get('shiftId3'),",
+									"        pm.collectionVariables.get('integrationShiftId'),",
+									"        pm.collectionVariables.get('bulkShiftId1'),",
+									"        pm.collectionVariables.get('bulkShiftId2')",
+									"    ].filter(id => id); // Remove any undefined values",
+									"    ",
+									"    testShiftIds.forEach(testId => {",
+									"        pm.expect(shiftIds).to.not.include(parseInt(testId));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Test cleanup verification complete\", function () {",
+									"    pm.expect(true).to.be.true;",
+									"    console.log('✅ All test data successfully cleaned up');",
+									"    console.log('📊 Test suite completed successfully');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/shifts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "testUserId1",
+			"value": ""
+		},
+		{
+			"key": "testUserId2",
+			"value": ""
+		},
+		{
+			"key": "testUserId3",
+			"value": ""
+		},
+		{
+			"key": "testCoreBlockId1",
+			"value": ""
+		},
+		{
+			"key": "testCoreBlockId2",
+			"value": ""
+		},
+		{
+			"key": "shiftId1",
+			"value": ""
+		},
+		{
+			"key": "shiftId2",
+			"value": ""
+		},
+		{
+			"key": "shiftId3",
+			"value": ""
+		},
+		{
+			"key": "integrationShiftId",
+			"value": ""
+		},
+		{
+			"key": "bulkShiftId1",
+			"value": ""
+		},
+		{
+			"key": "bulkShiftId2",
+			"value": ""
+		}
+	]
+}

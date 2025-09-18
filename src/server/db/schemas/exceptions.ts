@@ -19,7 +19,7 @@ export const exceptions = createTable("exceptions", {
     .references(() => coreBlocks.id, { onDelete: "cascade" })
     .notNull(),
   date: date("date").notNull(),
-  describe: varchar("description", { length: 512 }).notNull(),
+  description: varchar("description", { length: 512 }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),

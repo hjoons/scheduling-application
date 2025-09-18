@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "user_core_idx" ON "UTPS_availabilities" USING btree ("user_id","core_id");

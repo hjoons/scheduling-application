@@ -1,0 +1,1664 @@
+{
+	"info": {
+		"_postman_id": "900a7a4e-f91e-46ae-bb80-1428470b6f3f",
+		"name": "Availability & Exceptions API  (Local)",
+		"description": "Complete CRUD operations for Availability and Exceptions with User lifecycle testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47432747",
+		"_collection_link": "https://hjoons-6329250.postman.co/workspace/UTP's-Workspace~7992f774-284a-465c-853d-da3e8b07920d/collection/47432747-900a7a4e-f91e-46ae-bb80-1428470b6f3f?action=share&source=collection_link&creator=47432747"
+	},
+	"item": [
+		{
+			"name": "Setup - User & Core Block Creation",
+			"item": [
+				{
+					"name": "1. Create Test User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('User created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.user).to.have.property('id');",
+									"});",
+									"",
+									"// Save user ID for other tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('testUserId', jsonData.user.id);",
+									"    console.log('Created test user with ID:', jsonData.user.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"email\": \"test.availability@example.com\",\n  \"role\": \"staff\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Create Test Core Block",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Core block created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.collectionVariables.set('testCoreId', jsonData.coreBlock.id);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"dayOfWeek\": \"mon\",\n  \"shiftOfDay\": \"m1\",\n  \"timeStart\": 900,\n  \"timeEnd\": 1200,\n  \"numberOfEmployees\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2A). Create 2nd Test Core Block",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test('Core block created successfully', function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"    pm.collectionVariables.set('testCoreId2', jsonData.coreBlock.id);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"dayOfWeek\": \"mon\",\n  \"shiftOfDay\": \"m2\",\n  \"timeStart\": 1200,\n  \"timeEnd\": 1700,\n  \"numberOfEmployees\": 3\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2B). Create Future Replace Test Core Block",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test('Core block created successfully', function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"    pm.collectionVariables.set('replaceCoreId', jsonData.coreBlock.id);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"dayOfWeek\": \"tues\",\r\n  \"shiftOfDay\": \"m1\",\r\n  \"timeStart\": 900,\r\n  \"timeEnd\": 1200,\r\n  \"numberOfEmployees\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Availability API Tests",
+			"item": [
+				{
+					"name": "3. GET User Availability (Empty - New User)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.expect(pm.response.code).to.eq(200)",
+									"});",
+									"",
+									"pm.test('User Id does not have any availability', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message.toLowerCase()).to.include('no availability found');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/availability/user/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"availability",
+								"user",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. POST Create User Availability (Valid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Availability created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.availabilities).to.be.an('array');",
+									"    pm.expect(jsonData.availabilities.length).to.eql(2);",
+									"});",
+									"",
+									"pm.test('Created availability has correct user ID', function () {",
+									"    const jsonData = pm.response.json();",
+									"    const coreId1 = parseInt(pm.collectionVariables.get('testCoreId'));",
+									"    const coreId2 = parseInt(pm.collectionVariables.get('testCoreId2'));",
+									"    jsonData.availabilities.forEach(availability => {",
+									"        pm.expect([coreId1, coreId2]).to.include(availability.coreId);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"availability\": [\n    { \"coreId\": {{testCoreId}} },\n    { \"coreId\": {{testCoreId2}} }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/availability/user/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"availability",
+								"user",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. POST Create Availability (Invalid User ID)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error mentions invalid user ID', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('Invalid user ID');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"availability\": [\n    { \"coreId\": 1 }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/availability/user/invalid_id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"availability",
+								"user",
+								"invalid_id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6. POST Create Availability (Empty Array)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 500', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error mentions empty body', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('cannot be empty');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"availability\": []\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/availability/user/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"availability",
+								"user",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7. POST Create Availability (Missing Core ID)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error type is VALIDATION_ERROR', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql('VALIDATION_ERROR');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"availability\": [\n    { \"invalidField\": \"value\" }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/availability/user/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"availability",
+								"user",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "8. GET User Availability (With Data)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('User now has availability', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.availabilities).to.be.an('array');",
+									"    pm.expect(jsonData.availabilities.length).to.be.greaterThan(0);",
+									"});",
+									"",
+									"pm.test('Availability includes core block details', function () {",
+									"    const jsonData = pm.response.json();",
+									"    const availability = jsonData.availabilities;",
+									"    availability.forEach(entry => {",
+									"        pm.expect(entry).to.have.property('coreId');",
+									"        pm.expect(entry).to.have.property('timeStart');",
+									"        pm.expect(entry).to.have.property('timeEnd');",
+									"        pm.expect(entry).to.have.property('dayOfWeek');",
+									"        pm.expect(entry).to.have.property('shiftOfDay');",
+									"        pm.expect(entry).to.have.property('numberOfEmployees');",
+									"    })",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/availability/user/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"availability",
+								"user",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "9. GET User Availability (Filter by Day)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Filtered results only show Monday', function () {",
+									"    const jsonData = pm.response.json();",
+									"    jsonData.availabilities.forEach(availability => {",
+									"        pm.expect(availability.dayOfWeek).to.eql('mon');",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/availability/user/{{testUserId}}?dayOfWeek=mon",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"availability",
+								"user",
+								"{{testUserId}}"
+							],
+							"query": [
+								{
+									"key": "dayOfWeek",
+									"value": "mon"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "10. PUT Replace User Availability",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Availability replaced successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.availabilities.length).to.eql(1);",
+									"});",
+									"",
+									"pm.test('Message indicates replacement', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('availability records for user');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"availability\": [\n    { \"coreId\": {{replaceCoreId}} }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/availability/user/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"availability",
+								"user",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "11. DELETE User Availability",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Availability deleted successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Message indicates deletion', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message.toLowerCase()).to.include('deleted');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/availability/user/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"availability",
+								"user",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Exceptions API Tests",
+			"item": [
+				{
+					"name": "12. GET User Exceptions (Empty - New User)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.expect(pm.response.code).to.eq(200)",
+									"});",
+									"",
+									"pm.test('User Id does not have any exceptions', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message.toLowerCase()).to.include('no exceptions');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions/user/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions",
+								"user",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "13. POST Create Exception (Valid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Exception created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.exception).to.have.property('id');",
+									"});",
+									"",
+									"pm.test('Exception has correct data', function () {",
+									"    const jsonData = pm.response.json();",
+									"    const userId = parseInt(pm.collectionVariables.get('testUserId'));",
+									"    const coreId = parseInt(pm.collectionVariables.get('testCoreId'));",
+									"    pm.expect(jsonData.exception.coreId).to.eql(coreId);",
+									"    pm.expect(jsonData.exception.description).to.eql('Doctor appointment');",
+									"});",
+									"",
+									"// Save exception ID for other tests",
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('exceptionId', jsonData.exception.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": {{testUserId}},\n  \"coreId\": {{testCoreId}},\n  \"date\": \"2025-08-25\",\n  \"description\": \"Doctor appointment\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "14. POST Create Exception (Missing Required Fields)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error type is VALIDATION_ERROR', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql('VALIDATION_ERROR');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": {{testUserId}},\n  \"date\": \"2025-08-25\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "15. POST Create Exception (Invalid Date Format)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 500', function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test('Error mentions internal error (parsing not implemented for sanitizing date)', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql('INTERNAL_ERROR');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": {{testUserId}},\n  \"coreId\": {{testCoreId}},\n  \"date\": \"invalid-date\",\n  \"description\": \"Test exception\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "16. GET User Exceptions (With Data)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('User now has exceptions', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.exceptions).to.be.an('array');",
+									"    pm.expect(jsonData.exceptions.length).to.be.greaterThan(0);",
+									"});",
+									"",
+									"pm.test('Exception includes core block details', function () {",
+									"    const jsonData = pm.response.json();",
+									"    const exception = jsonData.exceptions[0];",
+									"    pm.expect(exception).to.have.property('id');",
+									"    pm.expect(exception).to.have.property('coreId');",
+									"    pm.expect(exception).to.have.property('timeStart');",
+									"    pm.expect(exception).to.have.property('timeEnd');",
+									"    pm.expect(exception).to.have.property('numberOfEmployees');",
+									"    pm.expect(exception).to.have.property('date');",
+									"    pm.expect(exception).to.have.property('description');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions/user/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions",
+								"user",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "17. GET User Exceptions (Date Range Filter)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('All exceptions within date range', function () {",
+									"    const jsonData = pm.response.json();",
+									"    jsonData.exceptions.forEach(exception => {",
+									"        pm.expect(exception.date).to.match(/^2025-08/);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions/user/{{testUserId}}?startDate=2025-08-01&endDate=2025-08-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions",
+								"user",
+								"{{testUserId}}"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-08-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "18. GET Individual Exception",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Exception retrieved successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.exception).to.have.property('id');",
+									"    const expectedId = parseInt(pm.collectionVariables.get('exceptionId'));",
+									"    pm.expect(jsonData.exception.id).to.eql(expectedId);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions/{{exceptionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions",
+								"{{exceptionId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "19. PUT Update Exception (Partial)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Exception updated successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.exception.description).to.eql('Updated: Dentist appointment');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"description\": \"Updated: Dentist appointment\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions/{{exceptionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions",
+								"{{exceptionId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "20. PUT Update Exception (Invalid ID)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 404', function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test('Error type is NOT_FOUND', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql('NOT_FOUND');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"description\": \"Updated description\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions",
+								"99999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "21. DELETE Individual Exception",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Exception deleted successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.include('deleted successfully');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions/{{exceptionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions",
+								"{{exceptionId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Integration & Cascade Tests",
+			"item": [
+				{
+					"name": "22. Recreate Availability and Exceptions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Availability recreated', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"availability\": [\n    { \"coreId\": {{testCoreId}} }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/availability/user/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"availability",
+								"user",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "23. Recreate Exception",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Exception recreated', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.collectionVariables.set('exceptionId', jsonData.exception.id);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": {{testUserId}},\n  \"coreId\": {{testCoreId}},\n  \"date\": \"2025-08-30\",\n  \"description\": \"Final test exception\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "24. GET Exception Date Filter (Mismatched Dates)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error mentions both dates required', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.message).to.include('must be provided together');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions/user/{{testUserId}}?startDate=2025-08-01",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions",
+								"user",
+								"{{testUserId}}"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-08-01"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "25. DELETE User (Cascade Test)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('User deleted successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.include('deleted successfully');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "26. Verify Availability Cascaded Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400/404', function () {",
+									"    pm.expect([400, 404]).to.include(pm.response.code);",
+									"});",
+									"",
+									"pm.test('User no longer exists', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"    pm.expect(jsonData.error.type).to.eql(\"NOT_FOUND\");",
+									"    pm.expect(jsonData.error.message).to.include('not found');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/availability/user/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"availability",
+								"user",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "27. Verify Exception Cascaded Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400/404', function () {",
+									"    pm.expect([400, 404]).to.include(pm.response.code);",
+									"});",
+									"",
+									"pm.test('User no longer exists', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"    pm.expect(jsonData.error.type).to.eql(\"NOT_FOUND\");",
+									"    pm.expect(jsonData.error.message).to.include('not found');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions/user/{{testUserId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions",
+								"user",
+								"{{testUserId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Error Handling Tests",
+			"item": [
+				{
+					"name": "28. GET Availability for Non-existent User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400/404', function () {",
+									"    pm.expect([400, 404]).to.include(pm.response.code);    ",
+									"});",
+									"",
+									"pm.test('Error mentions invalid user ID', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"    pm.expect(jsonData.error.type).to.eql(\"NOT_FOUND\");",
+									"    pm.expect(jsonData.error.message).to.include('not found');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/availability/user/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"availability",
+								"user",
+								"99999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "29. GET Exceptions for Non-existent User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400/404', function () {",
+									"    pm.expect([400, 404]).to.include(pm.response.code);    ",
+									"});",
+									"",
+									"pm.test('Error mentions invalid user ID', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"    pm.expect(jsonData.error.type).to.eql(\"NOT_FOUND\");",
+									"    pm.expect(jsonData.error.message).to.include('not found');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions/user/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions",
+								"user",
+								"99999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "30. GET Exception Date Filter (Invalid Format)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 500', function () {",
+									"    pm.expect(pm.response.code, 500);",
+									"});",
+									"",
+									"pm.test('Error mentions invalid date format', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql('VALIDATION_ERROR');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/exceptions/user/{{testUserId}}?startDate=invalid-date&endDate=2025-08-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exceptions",
+								"user",
+								"{{testUserId}}"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "invalid-date"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-31"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cleanup",
+			"item": [
+				{
+					"name": "31. Delete Test Core Block",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Cleanup successful or resource not found', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks/{{testCoreId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks",
+								"{{testCoreId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "32. Delete 2nd Test Core Block",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Cleanup successful or resource not found', function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 404]);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks/{{testCoreId2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks",
+								"{{testCoreId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "33. Delete Future Replacement Core Block",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Cleanup successful or resource not found', function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 404]);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/core-blocks/{{replaceCoreId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"core-blocks",
+								"{{replaceCoreId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "testUserId",
+			"value": ""
+		},
+		{
+			"key": "testCoreId",
+			"value": "1"
+		},
+		{
+			"key": "exceptionId",
+			"value": ""
+		},
+		{
+			"key": "testCoreId2",
+			"value": ""
+		},
+		{
+			"key": "replaceCoreId",
+			"value": ""
+		}
+	]
+}
